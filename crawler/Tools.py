@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import urllib
 import urllib2
 import urlparse
@@ -10,7 +11,10 @@ class Tools:
         pass
 
     @classmethod
-    def download(cls,url, user_agent='wswp', proxy=None, num_retries=2):
+    def download(cls,url, type, user_agent='classproject', proxy=None, num_retries=2):
+        '''
+        type: 0=html, 1=json, 2=music
+        '''
         """Download function with support for proxies"""
         print 'Downloading:', url
         headers = {'User-agent': user_agent}
@@ -28,8 +32,12 @@ class Tools:
                 if hasattr(e, 'code') and 500 <= e.code < 600:
                     # retry 5XX HTTP errors
                     html = cls.download(url, user_agent, proxy, num_retries - 1)
+        if(type==1):
+            json_obj = json.loads(html)
+            html = json.dumps(json_obj, ensure_ascii=False).encode('utf-8')
         return html
-
+    '''转码，得到MP3文件的下载地址
+    '''
     @classmethod
     def song_id_to_url(cls,code):
         l10 = None
@@ -71,22 +79,82 @@ class Tools:
             l7 += 1
         l9 = l9.replace('+', ' ')
         return l9
+    '''搜索当前url中所有的歌曲id
+    '''
     @classmethod
-    def search_ids(cls,url):
-        html = cls.download(url)
+    def search_id_list(cls,url):
+        html = cls.download(url,type=0)
+        rule = re.compile('onclick="play\(\'(.*?)\'')
+        id_list = rule.findall(html)
+        return id_list,html
+    '''搜索当前html对应的歌曲的id
+    '''
+    @classmethod
+    def search_id(cls,html):
         rule = re.compile('<div class="cd2play">(.*?)</div>', re.DOTALL)
         content = rule.findall(html)[0]
-        print content
         rule = re.compile('onclick="play\(\'(.*?)\'')
-        ids = rule.findall(content)
-        return ids
+        id = rule.findall(content)
+        return id[0]
 
     @classmethod
-    def fetch_one_song(cls,id):
-        info_json=cls.download('http://www.xiami.com/song/playlist/id/'+id+'/object_name/default/object_id/0/cat/json')
+    def fetch_one_song(cls,id,html):
+        info_json=cls.download('http://www.xiami.com/song/playlist/id/'+id+'/object_name/default/object_id/0/cat/json',type=1)
         info=json.loads(info_json)
+        title=info['data']['trackList'][0]['songName']
         singer=info['data']['trackList'][0]['singers']
+        songwriter=info['data']['trackList'][0]['songwriters']
+
+        rule = re.compile('<div class="lrc_main">(.*?)</div>', re.DOTALL)
+        lyrics=rule.findall(html)
+        if len(lyrics)>0:
+            lyrics=lyrics[0]
+            lyrics = lyrics.replace('\n', '')
+            lyrics = lyrics.replace('\r', '')
+            lyrics = lyrics.replace('\t', '')
+            lyrics = lyrics.replace('<br />', '\n')
+        else:
+            lyrics=''
+        song_file=cls.download(cls.song_id_to_url(info['data']['trackList'][0]['location']),type=2)
+        return lyrics,title,singer,songwriter,song_file,info_json
+
+    @classmethod
+    def save_song(cls,id,lyrics, title, singer, songwriter, song_file, info_json, html,dir='data'):
+
+        song_meta={}
+        song_meta['id']=id
+
+        song_meta['lyrics']=lyrics
 
 
-if __name__ == '__main__':
-    print Tools.search_ids("http://www.xiami.com/song/1774490672")
+        song_meta['title']=title
+
+        song_meta['singer']=singer
+
+        song_meta['songwriter']=songwriter
+
+        song_meta_json=json.dumps(song_meta)
+
+        json_obj = json.loads(song_meta_json)
+        song_meta_json = json.dumps(json_obj, ensure_ascii=False).encode('utf-8')
+
+
+        #write meta data of song
+        song_meta_output = open(dir+'/'+id+'.meta', 'w')
+        song_meta_output.write(song_meta_json)
+        song_meta_output.close()
+
+        #write song's info json
+        info_json_output = open(dir+'/'+id + '.json', 'w')
+        info_json_output.write(info_json)
+        info_json_output.close()
+
+        #write mp3 file
+        song_file_output = open(dir+'/'+id + '.mp3', 'wb')
+        song_file_output.write(song_file)
+        song_file_output.close()
+
+        #write html file
+        html_output = open(dir+'/'+id + '.html', 'w')
+        html_output.write(html)
+        html_output.close()
