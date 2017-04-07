@@ -102,7 +102,15 @@ class Tools:
         info_json=cls.download('http://www.xiami.com/song/playlist/id/'+id+'/object_name/default/object_id/0/cat/json',type=1)
         info=json.loads(info_json)
         title=info['data']['trackList'][0]['songName']
-        singer=info['data']['trackList'][0]['singers']
+        singer_source=info['data']['trackList'][0]['singersSource']
+        singer=[]
+        for i in singer_source:
+            tmp={}
+            tmp["artistName"]=i['artistName']
+            tmp["artistId"] = i['artistId']
+            tmp["artistStringId"] = i['artistStringId']
+            tmp["artistLogo"] = i['artistLogo']
+            singer.append(tmp)
         songwriter=info['data']['trackList'][0]['songwriters']
 
         rule = re.compile('<div class="lrc_main">(.*?)</div>', re.DOTALL)
@@ -119,7 +127,7 @@ class Tools:
         return lyrics,title,singer,songwriter,song_file,info_json
 
     @classmethod
-    def save_song(cls,id,lyrics, title, singer, songwriter, song_file, info_json, html,dir='data'):
+    def save_song(cls,id,lyrics, title, singer , songwriter, song_file, info_json, html,dir='data'):
 
         song_meta={}
         song_meta['id']=id
