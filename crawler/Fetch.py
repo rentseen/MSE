@@ -1,19 +1,30 @@
 # -*- coding: utf-8 -*-
 from Tools import Tools
+import time
 
-
-queue=["2088114","1775713590","1792702528","1024665","1795444216","1775504460","1795531539"]
-record=[]
-count=0
-threshold=12000
+#parameters
+queue=["1776120826","1774998332","1774112695","1773273264","1774781482","1770506605"]
+record=Tools.load_record("data/songID.txt")
+count=len(record)
+threshold=20000
 
 record_output=open("data/songID.txt","w+")
+
+for id in record:
+    record_output.write(id)
+    record_output.write('\n')
 
 while(len(queue)>0 and count<threshold):
     id=queue.pop(0)
     if id not in record:
         id_list, html = Tools.search_id_list('http://www.xiami.com/song/' + id)
+        if html==None:
+            time.sleep(100)
+            continue
         lyrics, title, singer, songwriter, song_file, info_json = Tools.fetch_one_song(id, html)
+        if lyrics==None:
+            time.sleep(100)
+            continue
         if len(lyrics)<5:
             continue
         record.append(id)
@@ -29,10 +40,4 @@ while(len(queue)>0 and count<threshold):
         print count
 
 
-record_output.write(str(len(record)))
-record_output.write('\n')
 record_output.close()
-
-
-
-

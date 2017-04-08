@@ -11,7 +11,7 @@ class Tools:
         pass
 
     @classmethod
-    def download(cls,url, type, user_agent='classproject', proxy=None, num_retries=2):
+    def download(cls,url, type, user_agent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36', proxy=None, num_retries=5):
         '''
         type: 0=html, 1=json, 2=music
         '''
@@ -25,14 +25,10 @@ class Tools:
             opener.add_handler(urllib2.ProxyHandler(proxy_params))
         try:
             html = opener.open(request).read()
-        except urllib2.URLError as e:
-            print 'Download error:', e.reason
+        except Exception,e:
+            print 'Download error:'
             html = None
-            if num_retries > 0:
-                if hasattr(e, 'code') and 500 <= e.code < 600:
-                    # retry 5XX HTTP errors
-                    html = cls.download(url, user_agent, proxy, num_retries - 1)
-        if(type==1):
+        if(type==1 and html!=None):
             json_obj = json.loads(html)
             html = json.dumps(json_obj, ensure_ascii=False).encode('utf-8')
         return html
@@ -84,6 +80,8 @@ class Tools:
     @classmethod
     def search_id_list(cls,url):
         html = cls.download(url,type=0)
+        if(html==None):
+            return None,None
         rule = re.compile('onclick="play\(\'(.*?)\'')
         id_list = rule.findall(html)
         return id_list,html
@@ -100,6 +98,8 @@ class Tools:
     @classmethod
     def fetch_one_song(cls,id,html):
         info_json=cls.download('http://www.xiami.com/song/playlist/id/'+id+'/object_name/default/object_id/0/cat/json',type=1)
+        if info_json==None:
+            return None,None,None,None,None,None
         info=json.loads(info_json)
         title=info['data']['trackList'][0]['songName']
         singer_source=info['data']['trackList'][0]['singersSource']
@@ -166,3 +166,14 @@ class Tools:
         html_output = open(dir+'/'+id + '.html', 'w')
         html_output.write(html)
         html_output.close()
+    @classmethod
+    def load_record(cls,path):
+        file_input=open(path,'r')
+        record=[]
+        while True:
+            line=file_input.readline()
+            if not line:
+                break
+            record.append(line.strip())
+        file_input.close()
+        return record
