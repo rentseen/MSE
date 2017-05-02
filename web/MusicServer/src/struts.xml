@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+    <!DOCTYPE struts PUBLIC     
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"     
+        "http://struts.apache.org/dtds/struts-2.0.dtd">    
+<struts>  
+    <package name="musicServer" extends="struts-default">    
+        <action name="test" class="com.devil.music.Web.Action.TestAction" method="test">
+        	<result></result>
+        </action>
+         <action name="login" class="com.devil.music.Web.Action.LoginAction" method="login">  
+            <result name="success">/pages/home.jsp</result>  
+        	<result name="fail">/pages/error.jsp</result>  
+        </action>    
+        <action name="register" class="com.devil.music.Web.Action.LoginAction" method="register">  
+            <result name="success">/pages/home.jsp</result>  
+        	<result name="fail">/pages/error.jsp</result>  
+        </action>   
+        <action name="gotoRegister" class="com.devil.music.Web.Action.LoginAction" method="commonJump">  
+            <result name="success">/pages/register.jsp</result>   
+        </action>   
+       	<action name="gotoLogin" class="com.devil.music.Web.Action.LoginAction" method="commonJump">  
+            <result name="success">/pages/login.jsp</result>   
+        </action>   
+        <action name="getUserInfo" class="com.devil.music.Web.Action.SearchAction" method="getUserInfo">
+        	<result></result>
+        </action>
+        <action name="search" class="com.devil.music.Web.Action.SearchAction" method="search">
+        	<result></result>
+        </action>
+        <action name="saveListenHistory" class="com.devil.music.Web.Action.SearchAction" method="saveListenHistory">
+        	<result></result>
+        </action>
+        <action name="saveClickHistory" class="com.devil.music.Web.Action.SearchAction" method="saveClickHistory">
+        	<result></result>
+        </action>
+        <action name="showSongDetail" class="com.devil.music.Web.Action.SearchAction" method="showSongDetail">
+        	<result></result>
+        </action>
+        <action name="showSingerDetail" class="com.devil.music.Web.Action.SearchAction" method="showSingerDetail">
+        	<result></result>
+        </action>
+        
+        
+    <!--  
+    	<action name="gotoLogin" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="gotoLogin">
+        	<result name="success">/ht_pages/ht_login.jsp</result>
+        </action>   
+        <action name="login" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="login">  
+            <result name="success">/ht_pages/ht_home.jsp</result>  
+        	<result name="fail">/ht_pages/error.jsp</result>  
+        </action>          
+    	<action name="gotoRegisterInfo" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="gotoRegisterInfo">
+        	<result name="success">/ht_pages/register_info.jsp</result>
+        </action>
+        <action name="gotoRegisterConfirm" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="gotoRegisterConfirm">
+        	<result name="success">/ht_pages/register_confirm.jsp</result>
+        </action>
+         <action name="submitRegisterInfo" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="submitRegisterInfo">
+        	<result></result>
+        </action>
+        <action name="gotoRegisterValidate" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="gotoRegisterValidate">
+        	<result name="success">/ht_pages/register_validate.jsp</result>
+        </action>
+        <action name="getCountryList" class="com.zw.htbund.Web.Action.CommonAction" method="getCountryList">
+        	<result></result>
+        </action>
+        <action name="checkEmail" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="checkEmail">
+        	<result></result>
+        </action>
+       
+        <action name="gotoRegisterComplete" class="com.zw.htbund.Web.Action.BungUserRegisterAction" method="gotoRegisterComplete">
+        	<result name="success">/ht_pages/register_complete.jsp</result>
+        </action>
+        
+        <action name="gotoForecast" class="com.zw.htbund.Web.Action.PackageForecastAction" method="gotoForecast">
+        	<result name="success">/ht_pages/forecast_info.jsp</result>
+        </action>
+        
+        <action name="gotoHome" class="com.zw.htbund.Web.Action.PackageForecastAction" method="gotoHome">
+        	<result name="success">/ht_pages/ht_home.jsp</result>
+        </action>
+        
+        <action name="gotoForecastComplete" class="com.zw.htbund.Web.Action.PackageForecastAction" method="gotoForecastComplete">
+        	<result name="success">/ht_pages/forecast_complete.jsp</result>
+        </action>
+        
+        <action name="submitForecastInfo" class="com.zw.htbund.Web.Action.PackageForecastAction" method="submitForecastInfo">
+        	<result name="success">/ht_pages/forecast_complete.jsp</result>
+            <result name="fail">/ht_pages/error.jsp</result>  
+        </action>
+        
+        <action name="getSenderAddressList" class="com.zw.htbund.Web.Action.PackageForecastAction" method="getSenderAddressList">
+        	<result></result>
+        </action>
+        
+
+        <action name="gotoPackageManage" class="com.zw.htbund.Web.Action.PackageManagementAction" method="gotoPackageManage">
+        	<result name="success">/ht_pages/packageManage.jsp</result>
+        </action>
+        
+        <action name="getForcastedPackages" class="com.zw.htbund.Web.Action.PackageManagementAction" method="getForcastedPackages">
+        	<result></result>
+        </action>
+        
+        <action name="gotoSplitPackage" class="com.zw.htbund.Web.Action.PackageManagementAction" method="gotoSplitPackage">
+        	<result name="success">/ht_pages/splitPackage.jsp</result>
+        </action>
+        
+        <action name="getSplitingPackages" class="com.zw.htbund.Web.Action.PackageManagementAction" method="getSplitingPackages">
+        	<result></result>
+        </action>
+        
+
+        <action name="gotoModifyPassword" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="commonJump">
+        	<result name="success">/ht_pages/password_modify.jsp</result>
+        </action>
+        
+        <action name="gotoLoginInfo" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="commonJump">
+        	<result name="success">/ht_pages/login_info.jsp</result>
+        </action>
+        
+        <action name="gotoModifyInfo" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="commonJump">
+        	<result name="success">/ht_pages/info_modify.jsp</result>
+        </action>
+        
+        <action name="gotoManageAddress" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="gotoManageAddress">
+        	<result name="success">/ht_pages/address_manage.jsp</result>
+        </action>
+        
+        <action name="searchReceiverAddress" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="searchReceiverAddress">
+        	<result name="success">/ht_pages/address_manage.jsp</result>
+        </action>
+        
+        <action name="checkPassword" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="checkPassword">
+        	<result></result>
+        </action>
+        
+        <action name="submitPasswordModify" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="submitPasswordModify">
+        	<result name="success">/ht_pages/modify_success.jsp</result>
+        	<result name="fail">/ht_pages/error.jsp</result>  
+        </action>
+
+        <action name="submitInfoModify" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="submitInfoModify">
+        	<result name="success">/ht_pages/modify_success.jsp</result>
+        	<result name="fail">/ht_pages/error.jsp</result>  
+        </action>
+        
+        <action name="getUserInfo" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="getUserInfo">
+        	<result></result>
+        </action>
+        
+        <action name="getReceiverAddressList" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="getReceiverAddressList">
+        	<result></result>
+        </action>
+        
+        <action name="submitReceiverAddress" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="submitReceiverAddress">
+        	<result name="success">/ht_pages/address_manage.jsp</result>
+        	<result name="fail">/ht_pages/error.jsp</result>  
+        </action>
+        
+        <action name="deleteReceiverAddress" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="deleteReceiverAddress">
+        	<result name="success">/ht_pages/address_manage.jsp</result>
+        	<result name="fail">/ht_pages/error.jsp</result>  
+        </action>
+        
+        <action name="getReceiverAddressDetail" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="getReceiverAddressDetail">
+        	<result></result>
+        </action>
+        
+        <action name="getLoginInfo" class="com.zw.htbund.Web.Action.BungUserInfoAction" method="getLoginInfo">
+        	<result></result>
+        </action>
+        -->
+    </package>  
+</struts>    

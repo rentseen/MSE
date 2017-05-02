@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:tx="http://www.springframework.org/schema/tx"  
+    xsi:schemaLocation="  
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd  
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd  
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">  
+    
+    <bean id="testService" class="com.devil.music.Web.Service.Impl.TestServiceImpl"></bean>  
+    <bean id="testAction" scope="prototype" class="com.devil.music.Web.Action.TestAction">
+    	<property name="testService" ref="testService"></property>
+    </bean>  
+ 
+ <!--  
+    <bean id="bungUserRegisterService" class="com.zw.htbund.Web.Service.Impl.BungUserRegisterServiceImpl"></bean>  
+    <bean id="bungUserRegisterAction" scope="prototype" class="com.zw.htbund.Web.Action.BungUserRegisterAction">
+    	<property name="bungUserRegisterService" ref="bungUserRegisterService"></property>
+    </bean>  
+    
+    <bean id="bungUserInfoService" class="com.zw.htbund.Web.Service.Impl.BungUserInfoServiceImpl"></bean>  
+    <bean id="bungUserInfoAction" scope="prototype" class="com.zw.htbund.Web.Action.BungUserInfoAction">
+    	<property name="bungUserInfoService" ref="bungUserInfoService"></property>
+    </bean>  
+    
+    <bean id="packageForecastService" class="com.zw.htbund.Web.Service.Impl.PackageForecastServiceImpl"></bean>  
+    <bean id="packageForecastAction" scope="prototype" class="com.zw.htbund.Web.Action.PackageForecastAction">
+    	<property name="packageForecastService" ref="packageForecastService"></property>
+    </bean>  
+    
+    <bean id="packageManagementService" class="com.zw.htbund.Web.Service.Impl.PackageManagementServiceImpl"></bean>  
+    <bean id="packageManagementAction" scope="prototype" class="com.zw.htbund.Web.Action.PackageManagementAction">
+    	<property name="packageManagementService" ref="packageManagementService"></property>
+    </bean>  
+    
+    <bean id="waybillService" class="com.zw.htbund.Web.Service.Impl.WaybillServiceImpl"></bean>  
+    <bean id="waybillAction" scope="prototype" class="com.zw.htbund.Web.Action.WaybillAction">
+    	<property name="waybillService" ref="waybillService"></property>
+    </bean>  
+   -->
+</beans> 
