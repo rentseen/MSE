@@ -115,9 +115,9 @@ int main(int argc, char **args){
 
 		int lyrics_len = lyrics_end - lyrics_start + 1;
 		char* str = (char*) malloc(lyrics_len + 1);
-		snprintf(str, size, "%s", (char*)(line + lyrics_start));
-		printf("%s\n\n", str);
-
+		snprintf(str, lyrics_len, "%s", (char*)(line + lyrics_start));
+		printf("%s has lyrics as:\n%s\n\n", pEnt->d_name, str);
+		free(str);
 		
 		free(line);
 		fclose(pFile);
