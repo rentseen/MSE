@@ -32,7 +32,7 @@ int find_lyrics(const char* line, int* start, int* end){
 		char* str = (char*) malloc(size + 1);
 		snprintf(str, size, "%s", (char*)(line + tokens[i].start));
 	
-		/* check if the find the token "lyrics" */
+		/* check if found the token "lyrics" */
 		if(!strncmp(str, "lyrics", 6)){
 			*start = tokens[i+1].start;
 			*end = tokens[i+1].end;
@@ -114,11 +114,12 @@ int main(int argc, char **args){
 		}
 
 		int lyrics_len = lyrics_end - lyrics_start + 1;
-		char* str = (char*) malloc(lyrics_len + 1);
-		snprintf(str, lyrics_len, "%s", (char*)(line + lyrics_start));
-		printf("%s has lyrics as:\n%s\n\n", pEnt->d_name, str);
-		free(str);
-		
+		char* lyrics = (char*) malloc(lyrics_len + 1);
+		snprintf(lyrics, lyrics_len, "%s", (char*)(line + lyrics_start));
+		printf("%s has lyrics as:\n%s\n\n", pEnt->d_name, lyrics);
+
+
+		free(lyrics);		
 		free(line);
 		fclose(pFile);
 
