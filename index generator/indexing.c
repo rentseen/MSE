@@ -14,25 +14,25 @@
 /* parse a line in json type, set the position of lyrics */
 /* return 1 if lyrics found, otherwise return 0 */
 int find_lyrics(const char* line, int* start, int* end){
+	/* init jsmn parser */
 	jsmn_parser parser;
 	jsmntok_t tokens[JSON_TOKEN_NUM];
-
 	jsmn_init(&parser);
 
+	/* call for jsmn to parse json string */
 	int cnt = jsmn_parse(&parser, line, strlen(line), tokens, JSON_TOKEN_NUM);
-
 	if(cnt < 0){
 		printf("Error: jsmn parsing failed, returned %d\n", cnt);
 		return 0;
 	}
 
+	/* finding token "lyrics" */
 	int i;
 	for(i = 0; i < cnt; i++){
 		int size = tokens[i].end - tokens[i].start + 1;
 		char* str = (char*) malloc(size + 1);
 		snprintf(str, size, "%s", (char*)(line + tokens[i].start));
 	
-		/* check if found the token "lyrics" */
 		if(!strncmp(str, "lyrics", 6)){
 			*start = tokens[i+1].start;
 			*end = tokens[i+1].end;
@@ -95,7 +95,6 @@ int main(int argc, char **args){
 		int size = (size_t) ftell(pFile);
 		size = (size / 8 + 1) * 8; /* align to 8 */ 
 		fseek(pFile, 0L, SEEK_SET);
-
 		char* line = (char*) malloc(size);
 		if(fgets(line, size, pFile) == NULL){
 			printf("Error: reading lines failed\n");
@@ -103,20 +102,21 @@ int main(int argc, char **args){
 			continue;
 		}
 		
-		//printf("aligned size:%d\n%s\n", size, line);
-
 		/* start & end pos of lyrics */
 		int lyrics_start, lyrics_end;
-
 		if(!find_lyrics(line, &lyrics_start, &lyrics_end)){
 			printf("Error: no lyrics found in file: %s\n", pEnt->d_name);
 			continue;
 		}
 
+		/* extract the string lyrics */
 		int lyrics_len = lyrics_end - lyrics_start + 1;
 		char* lyrics = (char*) malloc(lyrics_len + 1);
 		snprintf(lyrics, lyrics_len, "%s", (char*)(line + lyrics_start));
 		printf("%s has lyrics as:\n%s\n\n", pEnt->d_name, lyrics);
+
+
+
 
 
 		free(lyrics);		
@@ -124,7 +124,6 @@ int main(int argc, char **args){
 		fclose(pFile);
 
 		cnt ++;
-		
 	}
 
 	closedir(pDir);
