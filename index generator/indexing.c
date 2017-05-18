@@ -7,8 +7,26 @@
 
 
 #define DATA_FILE_SUFFIX	".data"
+#define JSON_TOKEN_NUM		64
 
 
+
+/* parse a line in json type */
+int parse(const char* str){
+	jsmn_parser parser;
+	jsmntok_t tokens[JSON_TOKEN_NUM];
+
+	jsmn_init(&parser);
+
+	int cnt = jsmn_parse(&parser, str, strlen(str), tokens, JSON_TOKEN_NUM);
+
+	printf("jsmn parse token cnt = %d\n", cnt);
+
+	return 0;
+}
+
+
+/* check whether str ended with suffix */
 int EndWith(const char* str, const char* suffix){
 	if(!str || !suffix)
 		return 0;
@@ -63,9 +81,13 @@ int main(int argc, char **args){
 			free(line);
 			continue;
 		}
-
 		
-		printf("aligned size:%d\n%s\n", size, line);
+		//printf("aligned size:%d\n%s\n", size, line);
+
+		parse(line);
+
+
+
 		
 		free(line);
 		fclose(pFile);
