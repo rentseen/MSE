@@ -99,8 +99,7 @@ int main(int argc, char **args){
 		fclose(pFile);
 
 		cnt ++;
-		if(cnt == 128)
-			break;
+		
 	}
 
 	closedir(pDir);
