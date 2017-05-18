@@ -7,7 +7,7 @@
 
 
 #define DATA_FILE_SUFFIX	".data"
-#define JSON_TOKEN_NUM		64
+#define JSON_TOKEN_NUM		256
 
 
 
@@ -20,7 +20,10 @@ int parse(const char* str){
 
 	int cnt = jsmn_parse(&parser, str, strlen(str), tokens, JSON_TOKEN_NUM);
 
-	printf("jsmn parse token cnt = %d\n", cnt);
+	if(cnt < 0){
+		printf("jsmn parse token cnt = %d\n", cnt);
+		return 1;
+	}
 
 	return 0;
 }
@@ -84,7 +87,10 @@ int main(int argc, char **args){
 		
 		//printf("aligned size:%d\n%s\n", size, line);
 
-		parse(line);
+		if(parse(line)){
+			printf("file name: %s\n", pEnt->d_name);
+		}
+
 
 
 
