@@ -152,6 +152,10 @@ int main(int argc, char **args){
 		int size = (size_t) ftell(pFile);
 		size = (size / 8 + 1) * 8; /* align to 8 */ 
 		fseek(pFile, 0L, SEEK_SET);
+		if(size == 0){ /* skip empty file */
+			fclose(pFile);
+			continue;
+		}
 		char* line = new char[size];
 		if(fgets(line, size, pFile) == NULL){
 			printf("Error: reading lines failed\n");
@@ -175,18 +179,19 @@ int main(int argc, char **args){
 		char* lyrics_en = new char[lyrics_len + 1];
 		std::string* lyrics_cn = new std::string("");
 		divide_lang(lyrics, lyrics_en, lyrics_cn);
-		//printf("lyrics_en len=%d\n%s\n", strlen(lyrics_en), lyrics_en);
-		//std::cout<<"lyrics_cn len="<<lyrics_cn.length()<<"\n"<<lyrics_cn<<std::endl;
+	
+		/* lexical analysis for chinese using THULAC */
+		if(lyrics_cn->size() > 0){
+			THULAC_result* result = new THULAC_result;
+			lac.cut(*lyrics_cn, *result);
+			std::cout<<'#'<<cnt<<','<<pEnt->d_name<<", "<<result->size()<<std::endl;
+			print(*result, seg_only, separator);
+			std::cout<<"# print finished\n";
+			
+			delete result;
+			delete lyrics_cn;
+		}
 
-		/* do lexical analysis for chinese using THULAC */
-		THULAC_result* result = new THULAC_result;
-		lac.cut(*lyrics_cn, *result);
-		std::cout<<'#'<<cnt<<','<<pEnt->d_name<<", "<<result->size()<<std::endl;
-		print(*result, seg_only, separator);
-
-
-		delete result;
-		delete lyrics_cn;
 		delete lyrics_en;
 
 
