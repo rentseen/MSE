@@ -31,17 +31,17 @@ int find_lyrics(const char* line, int* start, int* end){
 	int i;
 	for(i = 0; i < cnt; i++){
 		int size = tokens[i].end - tokens[i].start + 1;
-		char* str = (char*) malloc(size + 1);
+		char* str = new char[size + 1];
 		strncpy(str, (char*)(line + tokens[i].start), size);
 	
 		if(!strncmp(str, "lyrics", 6)){
 			*start = tokens[i+1].start;
 			*end = tokens[i+1].end;
-			free(str);
+			delete str;
 			return 1;
 		}
 		
-		free(str);
+		delete str;
 	}
 
 	return 0;
@@ -153,10 +153,10 @@ int main(int argc, char **args){
 		int size = (size_t) ftell(pFile);
 		size = (size / 8 + 1) * 8; /* align to 8 */ 
 		fseek(pFile, 0L, SEEK_SET);
-		char* line = (char*) malloc(size);
+		char* line = new char[size];
 		if(fgets(line, size, pFile) == NULL){
 			printf("Error: reading lines failed\n");
-			free(line);
+			delete line;
 			continue;
 		}
 		
@@ -169,11 +169,11 @@ int main(int argc, char **args){
 
 		/* extract the string lyrics */
 		int lyrics_len = lyrics_end - lyrics_start + 1;
-		char* lyrics = (char*) malloc(lyrics_len + 1);
+		char* lyrics = new char[lyrics_len + 1];
 		strncpy(lyrics, (char*)(line + lyrics_start), lyrics_len);
 
 		/* divide lyrics into english and chinese */
-		char* lyrics_en = (char*) malloc(lyrics_len + 1);
+		char* lyrics_en = new char[lyrics_len + 1];
 		std::string* lyrics_cn = new std::string("");
 		divide_lang(lyrics, lyrics_en, lyrics_cn);
 		//printf("lyrics_en len=%d\n%s\n", strlen(lyrics_en), lyrics_en);
@@ -186,14 +186,11 @@ int main(int argc, char **args){
 
 
 		delete lyrics_cn;
-		free(lyrics_en);
+		delete lyrics_en;
 
 
-
-
-
-		free(lyrics);		
-		free(line);
+		delete lyrics;		
+		delete line;
 		fclose(pFile);
 
 		cnt ++;
