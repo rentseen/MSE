@@ -1,2 +1,3 @@
 # index generator
-step 1, parsing the json file crawlered from web. Here, we use jsmn (https://github.com/zserge/jsmn) to parse the json file.
+step 1, parse the json file crawlered from web with jsmn (https://github.com/zserge/jsmn).
+step 2, perform lexical analysis for chinese with THULAC (https://github.com/thunlp/THULAC).
