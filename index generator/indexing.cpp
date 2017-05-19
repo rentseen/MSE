@@ -30,11 +30,12 @@ int find_lyrics(const char* line, int* start, int* end){
 	/* finding token "lyrics" */
 	int i;
 	for(i = 0; i < cnt; i++){
-		int size = tokens[i].end - tokens[i].start + 1;
+		int size = tokens[i].end - tokens[i].start;
 		char* str = new char[size + 1];
 		strncpy(str, (char*)(line + tokens[i].start), size);
-	
-		if(!strncmp(str, "lyrics", 6)){
+		str[size] = '\0';
+		//std::cout<<"json: "<<str<<"#"<<std::endl;
+		if(!strncmp(str, "lyrics", 7)){
 			*start = tokens[i+1].start;
 			*end = tokens[i+1].end;
 			delete str;
@@ -179,8 +180,7 @@ int main(int argc, char **args){
 		int lyrics_len = lyrics_end - lyrics_start;
 		char* lyrics = new char[lyrics_len + 1];
 		strncpy(lyrics, (char*)(line + lyrics_start), lyrics_len);
-		std::cout<<lyrics_start<<','<<lyrics_end<<','<<\
-			lyrics_len<<','<<lyrics<<std::endl;
+		lyrics[lyrics_len] = '\0';
 
 		/* divide lyrics into english and chinese */
 		char* lyrics_en = new char[lyrics_len + 1];
@@ -196,7 +196,7 @@ int main(int argc, char **args){
 			
 			delete result;
 			delete lyrics_cn;
-			std::cout<<"# print finished\n";
+
 		}
 
 		delete lyrics_en;
