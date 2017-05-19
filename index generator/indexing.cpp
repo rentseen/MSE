@@ -71,17 +71,22 @@ void divide_lang(const char* lyrics, char* lyrics_en, std::string* lyrics_cn){
 			lyrics_en[pos_en++] = lyrics[i];
 		}
 		else if(!(lyrics[i] & 0x20)){
-			/* skip this type */
+			/* skip 2-byte unicode */
 			i += 1;
 		}
 		else if(!(lyrics[i] & 0x10)){
 			/* utf-8 for chinese character */
+			if(i + 3 > len){
+				/* skip garbage at the end */
+				std::cout<<std::endl<<"skip garbage here"<<lyrics[i]<<std::endl;
+				break;
+			}
 			*lyrics_cn += lyrics[i++];
 			*lyrics_cn += lyrics[i++];
 			*lyrics_cn += lyrics[i];
 		}
 		else if(!(lyrics[i] & 0x08)){
-			/* skip this type */
+			/* skip 4-byte unicode */
 			i += 3;
 		}
 	}
@@ -171,9 +176,11 @@ int main(int argc, char **args){
 		}
 
 		/* extract the string lyrics */
-		int lyrics_len = lyrics_end - lyrics_start + 1;
+		int lyrics_len = lyrics_end - lyrics_start;
 		char* lyrics = new char[lyrics_len + 1];
 		strncpy(lyrics, (char*)(line + lyrics_start), lyrics_len);
+		std::cout<<lyrics_start<<','<<lyrics_end<<','<<\
+			lyrics_len<<','<<lyrics<<std::endl;
 
 		/* divide lyrics into english and chinese */
 		char* lyrics_en = new char[lyrics_len + 1];
@@ -186,10 +193,10 @@ int main(int argc, char **args){
 			lac.cut(*lyrics_cn, *result);
 			std::cout<<'#'<<cnt<<','<<pEnt->d_name<<", "<<result->size()<<std::endl;
 			print(*result, seg_only, separator);
-			std::cout<<"# print finished\n";
 			
 			delete result;
 			delete lyrics_cn;
+			std::cout<<"# print finished\n";
 		}
 
 		delete lyrics_en;
