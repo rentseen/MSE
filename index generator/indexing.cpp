@@ -121,9 +121,9 @@ int main(int argc, char **args){
 	/* init the THULAC, load models */
 	char* model_path = args[2];
 	char* user_dict_name=NULL;
-	bool seg_only = true;
-	bool useT2S = false;
-	bool useFilter = false;
+	bool seg_only = true;	/* only segment, no label need */
+	bool useT2S = true; 	/* change chi-traditional into chi-simple */
+	bool useFilter = false;	/* do not filte useless words */
 	char separator = '/';
 	THULAC lac;
 	lac.init(model_path, user_dict_name, seg_only, useT2S, useFilter);
@@ -134,7 +134,6 @@ int main(int argc, char **args){
 		printf("Error: cannot open directory %s\n", args[1]);
 		return 1;
 	}
-
 
 	clock_t clock_start = clock();
 	int cnt = 0;
@@ -187,20 +186,25 @@ int main(int argc, char **args){
 		std::string* lyrics_cn = new std::string("");
 		divide_lang(lyrics, lyrics_en, lyrics_cn);
 	
-		/* lexical analysis for chinese using THULAC */
+		std::cout<<'#'<<cnt<<','<<pEnt->d_name<<','<<std::endl;
+		/* indexing english words */
+		if(lyrics_en[0] != '\0'){
+			std::cout<<lyrics_en<<std::endl;
+		}
+		delete lyrics_en;
+
+		/* indexing chinese words */	
 		if(lyrics_cn->size() > 0){
+			/* lexical analysis for chinese using THULAC */
 			THULAC_result* result = new THULAC_result;
 			lac.cut(*lyrics_cn, *result);
-			std::cout<<'#'<<cnt<<','<<pEnt->d_name<<", "<<result->size()<<std::endl;
 			print(*result, seg_only, separator);
 			
 			delete result;
-			delete lyrics_cn;
-
 		}
-
-		delete lyrics_en;
-
+		delete lyrics_cn;
+		
+		std::cout<<std::endl;
 
 		delete lyrics;		
 		delete line;
