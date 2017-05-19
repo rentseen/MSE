@@ -115,10 +115,10 @@ int main(int argc, char **args){
 	/* init the THULAC, load models */
 	char* model_path = args[2];
 	char* user_dict_name=NULL;
-    bool seg_only = true;
-    bool useT2S = false;
-    bool useFilter = false;
-    char separator = '/';
+	bool seg_only = true;
+	bool useT2S = false;
+	bool useFilter = false;
+	char separator = '/';
 	THULAC lac;
 	lac.init(model_path, user_dict_name, seg_only, useT2S, useFilter);
 
@@ -179,12 +179,13 @@ int main(int argc, char **args){
 		//std::cout<<"lyrics_cn len="<<lyrics_cn.length()<<"\n"<<lyrics_cn<<std::endl;
 
 		/* do lexical analysis for chinese using THULAC */
-		THULAC_result result;
-		lac.cut(*lyrics_cn, result);
-		std::cout<<pEnt->d_name<<", "<<result.size()<<std::endl;
-		print(result, seg_only, separator);
+		THULAC_result* result = new THULAC_result;
+		lac.cut(*lyrics_cn, *result);
+		std::cout<<'#'<<cnt<<','<<pEnt->d_name<<", "<<result->size()<<std::endl;
+		print(*result, seg_only, separator);
 
 
+		delete result;
 		delete lyrics_cn;
 		delete lyrics_en;
 
