@@ -90,7 +90,6 @@ void divide_lang(const char* lyrics, char* lyrics_en, std::string* lyrics_cn){
 
 /* print the result of THULAC */
 void print(const THULAC_result& result, bool seg_only, char separator) {
- 	printf("Printing result, %d\n", result.size());
     for(int i = 0; i < result.size() - 1; i++) {
         if(i != 0) 
         	std::cout<<" ";
@@ -182,6 +181,7 @@ int main(int argc, char **args){
 		/* do lexical analysis for chinese using THULAC */
 		THULAC_result result;
 		lac.cut(*lyrics_cn, result);
+		std::cout<<pEnt->d_name<<", "<<result.size()<<std::endl;
 		print(result, seg_only, separator);
 
 
