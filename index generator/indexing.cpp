@@ -174,15 +174,20 @@ int main(int argc, char **args){
 
 		/* divide lyrics into english and chinese */
 		char* lyrics_en = (char*) malloc(lyrics_len + 1);
-		std::string lyrics_cn = "";
-		divide_lang(lyrics, lyrics_en, &lyrics_cn);
+		std::string* lyrics_cn = new std::string("");
+		divide_lang(lyrics, lyrics_en, lyrics_cn);
 		//printf("lyrics_en len=%d\n%s\n", strlen(lyrics_en), lyrics_en);
 		//std::cout<<"lyrics_cn len="<<lyrics_cn.length()<<"\n"<<lyrics_cn<<std::endl;
 
 		/* do lexical analysis for chinese using THULAC */
 		THULAC_result result;
-		lac.cut(lyrics_cn, result);
+		lac.cut(*lyrics_cn, result);
 		print(result, seg_only, separator);
+
+
+		delete lyrics_cn;
+		free(lyrics_en);
+
 
 
 
