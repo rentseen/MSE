@@ -16,7 +16,7 @@
 class LexicalAnalyzer
 {
 private:
-	char file_id[DATA_FILE_ID_SIZE];
+	char song_id[DATA_FILE_ID_SIZE];
 	char* input;
 	FILE* pFile;
 

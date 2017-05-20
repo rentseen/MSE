@@ -5,7 +5,7 @@
 #include "THULAC/include/thulac.h"
 
 LexicalAnalyzer::LexicalAnalyzer(const char* models_path){
-	file_id[0] = '\0';
+	song_id[0] = '\0';
 	input = NULL;
 	pFile = NULL;
 
@@ -30,7 +30,7 @@ LexicalAnalyzer::LexicalAnalyzer(const char* models_path){
 
 /* load input file */
 int LexicalAnalyzer::load(const char* file_path, const char* id){
-	sprintf(file_id, "%s", id);
+	sprintf(song_id, "%s", id);
 	pFile = fopen(file_path, "r");	
 	if(pFile == NULL){
 		printf("Error: cannot open file %s\n", file_path);
@@ -59,7 +59,7 @@ int LexicalAnalyzer::load(const char* file_path, const char* id){
 
 /* reset member variables */
 void LexicalAnalyzer::clean(){
-	file_id[0] = '\0';
+	song_id[0] = '\0';
 	if(input != NULL){
 		delete input;
 		input = NULL;
@@ -95,7 +95,7 @@ int LexicalAnalyzer::parse_lyrics(){
 	/* get the start & end pos of lyrics */
 	int lyrics_start, lyrics_end;
 	if(!find_lyrics(&lyrics_start, &lyrics_end)){
-		printf("Error: no lyrics found in file: %s\n", file_id);
+		printf("Error: no lyrics found in song: %s\n", song_id);
 		return 1;
 	}
 
@@ -110,7 +110,6 @@ int LexicalAnalyzer::parse_lyrics(){
 	divide_language(lyr_cn);
 
 	/* segment chinese words */	
-	printf("lyr_cn.size=%d\n", lyr_cn->size());
 	if(lyr_cn->size() > 0){
 		/* lexical analysis for chinese using THULAC */
 		
@@ -118,8 +117,6 @@ int LexicalAnalyzer::parse_lyrics(){
 	}
 
 	delete lyr_cn;
-	//std::cout<<'#'<<cnt<<','<<file_id<<','<<std::endl;
-
 	return 0;
 }
 
@@ -128,8 +125,8 @@ int LexicalAnalyzer::parse_lyrics(){
 void LexicalAnalyzer::print_lyrics() {
 	bool seg_only = true;
 	THULAC_result* lyr_cn = (THULAC_result*)lyrics_cn;
+	std::cout<<"song_id="<<song_id<<std::endl;
     std::cout<<"lyrics_en="<<*lyrics_en<<std::endl;
-
     std::cout<<"lyrics_cn=";
 	if(!lyr_cn->size()){
 		std::cout<<std::endl;

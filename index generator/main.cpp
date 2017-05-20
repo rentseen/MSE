@@ -43,12 +43,12 @@ int main(int argc, char **args){
 
 		/* open useful file */
 		char path[128];
-		char file_id[DATA_FILE_ID_SIZE];
+		char song_id[DATA_FILE_ID_SIZE];
 		sprintf(path, "%s/%s", args[1], pEnt->d_name);
-		sprintf(file_id, "%s", pEnt->d_name);
-		file_id[strlen(pEnt->d_name) - strlen(DATA_FILE_SUFFIX) + 1] = '\0';
+		sprintf(song_id, "%s", pEnt->d_name);
+		song_id[strlen(pEnt->d_name) - strlen(DATA_FILE_SUFFIX)] = '\0';
 		
-		status = analyzer.load(path, file_id);
+		status = analyzer.load(path, song_id);
 		if(status != 0){
 			continue;
 		}
