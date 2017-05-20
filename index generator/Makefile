@@ -1,13 +1,16 @@
 CC=g++ -std=c++11
 RM=rm
 
-indexing: indexing.o jsmn.o
-	$(CC) -o indexing indexing.o jsmn.o -I.
+indexing: main.o lexical_analyzer.o jsmn.o
+	$(CC) -o indexing main.o lexical_analyzer.o jsmn.o -I.
 
-indexing.o: indexing.cpp jsmn/jsmn.h THULAC/include/*
-	$(CC) -c indexing.cpp
+main.o: main.cpp
+	$(CC) -c main.cpp
 
-jsmn.o: jsmn/jsmn.c jsmn/jsmn.h
+lexical_analyzer.o: lexical_analyzer.cpp
+	$(CC) -c lexical_analyzer.cpp
+
+jsmn.o: jsmn/jsmn.c
 	$(CC) -c jsmn/jsmn.c
 
 clean:
