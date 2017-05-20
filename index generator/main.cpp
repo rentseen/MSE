@@ -65,7 +65,7 @@ int main(int argc, char **args){
 		}
 
 		status = Analyzer.parse_lyrics();
-		Analyzer.print_lyrics(Chinese);
+		//Analyzer.print_lyrics(Chinese);
 
 
 		while(1){
@@ -74,7 +74,7 @@ int main(int argc, char **args){
 				break;
 			
 			Indexer.add_posting(word_cn, song_id);
-			//std::cout<<word_cn<<std::endl;
+
 		}
 
 
@@ -83,11 +83,12 @@ int main(int argc, char **args){
 	
 	}
 
-	Indexer.print_postings();
-
 	clock_t clock_end = clock();
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 	printf("Totally, taken %lf seconds\n\n", duration);
+	
+	Indexer.print_postings();
+
 	closedir(pDir);
 	return 0;
 }

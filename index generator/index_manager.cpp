@@ -47,10 +47,10 @@ void IndexManager::print_postings(){
 	std::map<unsigned long, Posting*>::iterator ent;
 	std::map<unsigned long, Posting*>* list;
 	for(dict = Dict.begin(); dict != Dict.end(); dict++){
-		std::cout<<dict->first<<":\t";
+		std::cout<<dict->first<<">\t";
 		list = &(dict->second->List);
 		for(ent = list->begin(); ent != list->end(); ent++){
-			std::cout<<ent->first<<':'<<ent->second->count<<"\t>";
+			std::cout<<ent->first<<':'<<ent->second->count<<" ";
 		}
 		std::cout<<std::endl;
 	}
