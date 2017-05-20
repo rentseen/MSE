@@ -90,7 +90,7 @@ void LexicalAnalyzer::clean(){
 	pos_cn = 0;
 }
 
-
+/* parse lyrics into member variable (lyrics_en, lyrics_cn) */
 int LexicalAnalyzer::parse_lyrics(){
 	/* get the start & end pos of lyrics */
 	int lyrics_start, lyrics_end;
@@ -120,27 +120,45 @@ int LexicalAnalyzer::parse_lyrics(){
 	return 0;
 }
 
+/*  */
+std::string LexicalAnalyzer::poll_lyrics_cn(){
+	THULAC_result* lyr_cn = (THULAC_result*)lyrics_cn;
+	if(lyr_cn->size() == pos_cn){
+		std::string str("");
+		return str;
+	}
+	else{
+		std::string str((*lyr_cn)[pos_cn].first);
+		pos_cn++;
+		return str;
+	}
+}
 
 /* print lyrics */
-void LexicalAnalyzer::print_lyrics() {
+void LexicalAnalyzer::print_lyrics(lyrics_type type) {
 	bool seg_only = true;
 	THULAC_result* lyr_cn = (THULAC_result*)lyrics_cn;
 	std::cout<<"song_id="<<song_id<<std::endl;
-    std::cout<<"lyrics_en="<<*lyrics_en<<std::endl;
-    std::cout<<"lyrics_cn=";
-	if(!lyr_cn->size()){
-		std::cout<<std::endl;
-		return;
+
+	if(type == English || type == Both){
+    	std::cout<<"lyrics_en="<<*lyrics_en<<std::endl;
 	}
-    for(int i = 0; i < lyr_cn->size() - 1; i++) {
-        if(i != 0) 
-        	std::cout<<" ";
-        if(seg_only) {
-            std::cout << (*lyr_cn)[i].first;
-        }
-        else {
-            std::cout << (*lyr_cn)[i].first << '/' << (*lyr_cn)[i].second;
-        }
+    if(type == Chinese || type == Both){
+    	std::cout<<"lyrics_cn=";
+		if(lyr_cn->size() == 0){
+			std::cout<<std::endl;
+			return;
+		}
+    	for(int i = 0; i < lyr_cn->size() - 1; i++) {
+        	if(i != 0) 
+        		std::cout<<" ";
+        	if(seg_only) {
+            	std::cout << (*lyr_cn)[i].first;
+        	}
+        	else {
+            	std::cout << (*lyr_cn)[i].first << '/' << (*lyr_cn)[i].second;
+        	}
+    	}
     }
     std::cout<<std::endl<<std::endl;
 }

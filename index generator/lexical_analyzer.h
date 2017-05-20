@@ -5,13 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
-#include <cstdlib>
+//#include <cstdlib>
 #include <string>
+#include <iostream>
 
 #define DATA_FILE_ID_SIZE	32
 #define DATA_FILE_SUFFIX	".data"
 #define JSON_TOKEN_NUM		512
 
+enum lyrics_type{ English, Chinese, Both };
 
 class LexicalAnalyzer
 {
@@ -20,9 +22,8 @@ private:
 	char* input;
 	FILE* pFile;
 
-	/* pointer of THULAC class */
-	/* use void pointer to not include THULAC/*.h in main */
-	/* to avoid multiple definition*/
+	/* THULAC*, use void pointer to not include THULAC/*.h in main */
+	/* to avoid multiple definition link error */
 	void* lac;
 
 	char* lyrics;
@@ -45,18 +46,18 @@ public:
 	/* init with input file */
 	int load(const char* file_path, const char* id);
 	
-	/* clean to get input again */
-	void clean();
-
 	/* parse lyrics into english and chinese */
 	int parse_lyrics();
 
+	/* poll one word from lyrics */
+	std::string poll_lyrics_en();
+	std::string poll_lyrics_cn();
+
 	/* print lyrics */
-	void print_lyrics();
+	void print_lyrics(enum lyrics_type);
 
-
-	std::string next_en();
-	std::string next_cn();
+	/* clean to get input again */
+	void clean();
 
 };
 
