@@ -1,6 +1,7 @@
 
 #include "lexical_analyzer.h"
 #include "jsmn/jsmn.h"
+
 #include "THULAC/include/thulac.h"
 
 LexicalAnalyzer::LexicalAnalyzer(const char* models_path){
@@ -20,7 +21,6 @@ LexicalAnalyzer::LexicalAnalyzer(const char* models_path){
 	lyrics_len = 0;
 
 	lyrics_en = new std::string("");
-//	lyrics_cn = new std::string("");
 	lyrics_cn = new THULAC_result;
 	pos_en = 0;
 	pos_cn = 0;
@@ -115,10 +115,9 @@ int LexicalAnalyzer::parse_lyrics(){
 		/* lexical analysis for chinese using THULAC */
 		
 		((THULAC*)lac)->cut(*lyr_cn, *(THULAC_result*)lyrics_cn);
-		delete lyr_cn;
 	}
 
-//	delete lyr_cn;
+	delete lyr_cn;
 	//std::cout<<'#'<<cnt<<','<<file_id<<','<<std::endl;
 
 	return 0;
@@ -132,9 +131,10 @@ void LexicalAnalyzer::print_lyrics() {
     std::cout<<"lyrics_en="<<*lyrics_en<<std::endl;
 
     std::cout<<"lyrics_cn=";
-    std::cout<<((THULAC_result*)lyrics_cn)->size()<<std::endl;
-    std::cout<<lyr_cn->size()<<std::endl;
-if(lyr_cn->size() == 0) return;
+	if(!lyr_cn->size()){
+		std::cout<<std::endl;
+		return;
+	}
     for(int i = 0; i < lyr_cn->size() - 1; i++) {
         if(i != 0) 
         	std::cout<<" ";
