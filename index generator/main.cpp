@@ -1,7 +1,12 @@
 #include <iostream>
+#include <string>
 #include "time.h"
-#include "lexical_analyzer.h"
 
+#include "lexical_analyzer.h"
+#include "index_manager.h"
+
+
+#define DATA_FILE_ID_SIZE 	32
 
 /* check whether str ended with suffix */
 int suffix(const char* str, const char* suffix){
@@ -33,7 +38,10 @@ int main(int argc, char **args){
 	}
 
 	/* init analyzer with THULAC models */
-	LexicalAnalyzer analyzer(args[2]);
+	LexicalAnalyzer Analyzer(args[2]);
+
+	/* init index manager */
+	IndexManager Indexer;
 
 	clock_t clock_start = clock();
 	int status;
@@ -46,31 +54,37 @@ int main(int argc, char **args){
 
 		/* open useful file */
 		char path[128];
-		char song_id[DATA_FILE_ID_SIZE];
+		char id[DATA_FILE_ID_SIZE];
 		sprintf(path, "%s/%s", args[1], pEnt->d_name);
-		sprintf(song_id, "%s", pEnt->d_name);
-		song_id[strlen(pEnt->d_name) - strlen(DATA_FILE_SUFFIX)] = '\0';
-		
-		status = analyzer.load(path, song_id);
+		sprintf(id, "%s", pEnt->d_name);
+		id[strlen(pEnt->d_name) - strlen(DATA_FILE_SUFFIX)] = '\0';
+		unsigned long song_id = std::stoul(id);
+		status = Analyzer.load(path, song_id);
 		if(status != 0){
 			continue;
 		}
 
-		status = analyzer.parse_lyrics();
-		analyzer.print_lyrics(Chinese);
+		status = Analyzer.parse_lyrics();
+		Analyzer.print_lyrics(Chinese);
 
-		//std::string word_cn("a");
+
 		while(1){
-			std::string word_cn = analyzer.poll_lyrics_cn();
+			std::string word_cn = Analyzer.poll_lyrics_cn();
 			if(word_cn.size() == 0)
 				break;
-			std::cout<<word_cn<<std::endl;
+			
+			Indexer.add_posting(word_cn, song_id);
+			//std::cout<<word_cn<<std::endl;
 		}
 
 
-		analyzer.clean();
+		Analyzer.clean();
 		cnt ++;
+	
 	}
+
+	Indexer.print_postings();
+
 	clock_t clock_end = clock();
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 	printf("Totally, taken %lf seconds\n\n", duration);
