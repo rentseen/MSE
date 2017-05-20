@@ -110,13 +110,15 @@ int LexicalAnalyzer::parse_lyrics(){
 	divide_language(lyr_cn);
 
 	/* segment chinese words */	
+	printf("lyr_cn.size=%d\n", lyr_cn->size());
 	if(lyr_cn->size() > 0){
 		/* lexical analysis for chinese using THULAC */
 		
 		((THULAC*)lac)->cut(*lyr_cn, *(THULAC_result*)lyrics_cn);
+		delete lyr_cn;
 	}
 
-	delete lyr_cn;
+//	delete lyr_cn;
 	//std::cout<<'#'<<cnt<<','<<file_id<<','<<std::endl;
 
 	return 0;
@@ -128,7 +130,11 @@ void LexicalAnalyzer::print_lyrics() {
 	bool seg_only = true;
 	THULAC_result* lyr_cn = (THULAC_result*)lyrics_cn;
     std::cout<<"lyrics_en="<<*lyrics_en<<std::endl;
+
     std::cout<<"lyrics_cn=";
+    std::cout<<((THULAC_result*)lyrics_cn)->size()<<std::endl;
+    std::cout<<lyr_cn->size()<<std::endl;
+if(lyr_cn->size() == 0) return;
     for(int i = 0; i < lyr_cn->size() - 1; i++) {
         if(i != 0) 
         	std::cout<<" ";
