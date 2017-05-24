@@ -3,16 +3,18 @@
 
 #include <map>
 
-
+/* posting records term-doc association */
 struct Posting{
 
 	//unsigned long song_id;
-	unsigned count;
+	unsigned term_freq;
 };
 
 
+/* entry records a term and its posting list */
 class Entry{
 public:	
+	unsigned doc_freq; 
 	std::string word;
 	std::map<unsigned long, Posting*> List;
 
@@ -21,7 +23,7 @@ public:
 };
 
 
-
+/* indexmanager contains dictionary and manages it */
 class IndexManager{
 private:
 

@@ -65,15 +65,15 @@ int main(int argc, char **args){
 		}
 
 		status = Analyzer.parse_lyrics();
-		//Analyzer.print_lyrics(Chinese);
+		Analyzer.print_lyrics();
 
 
 		while(1){
-			std::string word_cn = Analyzer.poll_lyrics_cn();
-			if(word_cn.size() == 0)
+			std::string token = Analyzer.poll_lyrics();
+			if(token.size() == 0)
 				break;
 			
-			Indexer.add_posting(word_cn, song_id);
+			Indexer.add_posting(token, song_id);
 
 		}
 

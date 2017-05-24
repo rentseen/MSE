@@ -19,11 +19,8 @@ LexicalAnalyzer::LexicalAnalyzer(const char* models_path){
 	lyrics = NULL;
 	lyrics_len = 0;
 
-	lyrics_en = new std::string("");
-	lyrics_cn = new THULAC_result;
-	pos_en = 0;
-	pos_cn = 0;
-
+	lyr_token = new THULAC_result;
+	lyr_pos = 0;
 
 }
 
@@ -71,17 +68,12 @@ void LexicalAnalyzer::clean(){
 		delete lyrics;
 		lyrics = NULL;
 	}
-	if(lyrics_en != NULL){
-		delete lyrics_en;
-		lyrics_en = new std::string("");
-	}
-	if(lyrics_cn != NULL){
-		delete lyrics_cn;
-		lyrics_cn = (THULAC_result*) new THULAC_result;
+	if(lyr_token != NULL){
+		delete lyr_token;
+		lyr_token = (THULAC_result*) new THULAC_result;
 	}
 	lyrics_len = 0;
-	pos_en = 0;
-	pos_cn = 0;
+	lyr_pos = 0;
 }
 
 /* parse lyrics into member variable (lyrics_en, lyrics_cn) */
@@ -99,59 +91,45 @@ int LexicalAnalyzer::parse_lyrics(){
 	strncpy(lyrics, (char*)(input + lyrics_start), lyrics_len);
 	lyrics[lyrics_len] = '\0';
 
-	/* divide lyrics into english and chinese */
-	std::string* lyr_cn = new std::string("");
-	divide_language(lyr_cn);
+	/* segment lyrics into token sequence */	
+	((THULAC*)lac)->cut(lyrics, *(THULAC_result*)lyr_token);
 
-	/* segment chinese words */	
-	if(lyr_cn->size() > 0){
-		/* lexical analysis for chinese using THULAC */		
-		((THULAC*)lac)->cut(*lyr_cn, *(THULAC_result*)lyrics_cn);
-	}
-
-	delete lyr_cn;
 	return 0;
 }
 
 /*  */
-std::string LexicalAnalyzer::poll_lyrics_cn(){
-	THULAC_result* lyr_cn = (THULAC_result*)lyrics_cn;
-	if(lyr_cn->size() == pos_cn){
+std::string LexicalAnalyzer::poll_lyrics(){
+	THULAC_result* lyr = (THULAC_result*)lyr_token;
+	if(lyr->size() == lyr_pos){
 		std::string str("");
 		return str;
 	}
 	else{
-		std::string str((*lyr_cn)[pos_cn].first);
-		pos_cn++;
+		std::string str((*lyr)[lyr_pos].first);
+		lyr_pos++;
 		return str;
 	}
 }
 
 /* print lyrics */
-void LexicalAnalyzer::print_lyrics(lyrics_type type) {
+void LexicalAnalyzer::print_lyrics() {
 	bool seg_only = true;
-	THULAC_result* lyr_cn = (THULAC_result*)lyrics_cn;
+	THULAC_result* lyr = (THULAC_result*)lyr_token;
 	std::cout<<"song_id="<<song_id<<std::endl;
-
-	if(type == English || type == Both){
-    	std::cout<<"lyrics_en="<<*lyrics_en<<std::endl;
+   	std::cout<<"lyrics=";
+	if(lyr->size() == 0){
+		std::cout<<std::endl;
+		return;
 	}
-    if(type == Chinese || type == Both){
-    	std::cout<<"lyrics_cn=";
-		if(lyr_cn->size() == 0){
-			std::cout<<std::endl;
-			return;
-		}
-    	for(int i = 0; i < lyr_cn->size() - 1; i++) {
-        	if(i != 0) 
-        		std::cout<<" ";
-        	if(seg_only) {
-            	std::cout << (*lyr_cn)[i].first;
-        	}
-        	else {
-            	std::cout << (*lyr_cn)[i].first << '/' << (*lyr_cn)[i].second;
-        	}
-    	}
+    for(int i = 0; i < lyr->size() - 1; i++) {
+        if(i != 0) 
+        	std::cout<<" ";
+        if(seg_only) {
+           	std::cout << (*lyr)[i].first;
+        }
+        else {
+           	std::cout << (*lyr)[i].first << '/' << (*lyr)[i].second;
+        }
     }
     std::cout<<std::endl<<std::endl;
 }
@@ -191,40 +169,6 @@ int LexicalAnalyzer::find_lyrics(int* start, int* end){
 	}
 
 	return 0;
-}
-
-
-/* divide lyrics into english and chinese */
-void LexicalAnalyzer::divide_language(std::string* lyr_cn){
-	size_t len = strlen(lyrics);
-	int i;
-	int pos_en = 0;
-
-	for(i = 0; i < len; i++){
-		if(!(lyrics[i] & 0x80)){
-			/* ascii code */ 
-			*lyrics_en += lyrics[i];
-		}
-		else if(!(lyrics[i] & 0x20)){
-			/* skip 2-byte unicode */
-			i += 1;
-		}
-		else if(!(lyrics[i] & 0x10)){
-			/* utf-8 for chinese character */
-			if(i + 3 > len){
-				/* skip garbage at the end */
-				std::cout<<std::endl<<"skip garbage here"<<lyrics[i]<<std::endl;
-				break;
-			}
-			*lyr_cn += lyrics[i++];
-			*lyr_cn += lyrics[i++];
-			*lyr_cn += lyrics[i];
-		}
-		else if(!(lyrics[i] & 0x08)){
-			/* skip 4-byte unicode */
-			i += 3;
-		}
-	}
 }
 
 

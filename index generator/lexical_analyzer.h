@@ -12,7 +12,6 @@
 #define DATA_FILE_SUFFIX	".data"
 #define JSON_TOKEN_NUM		512
 
-enum lyrics_type{ English, Chinese, Both };
 
 class LexicalAnalyzer{
 private:
@@ -27,14 +26,11 @@ private:
 	char* lyrics;
 	int lyrics_len;
 
-	std::string* lyrics_en;
-	/* pointer of THULAC_result to contain chinese lyrics */
-	void* lyrics_cn;
-	int pos_en;
-	int pos_cn;
+	/* pointer of THULAC_result to contain segmented lyrics */
+	void* lyr_token;
+	int lyr_pos;
 
 	int find_lyrics(int* start, int* end);
-	void divide_language(std::string* lyr_cn);
 
 
 public:
@@ -47,11 +43,10 @@ public:
 	int parse_lyrics();
 
 	/* poll one word from lyrics */
-	std::string poll_lyrics_en();
-	std::string poll_lyrics_cn();
+	std::string poll_lyrics();
 
 	/* print lyrics */
-	void print_lyrics(enum lyrics_type);
+	void print_lyrics();
 
 	/* clean to get input again */
 	void clean();
