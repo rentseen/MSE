@@ -31,6 +31,7 @@ private:
 	int lyr_pos;
 
 	int find_lyrics(int* start, int* end);
+	void purify_lyrics();
 
 
 public:

@@ -91,6 +91,8 @@ int LexicalAnalyzer::parse_lyrics(){
 	strncpy(lyrics, (char*)(input + lyrics_start), lyrics_len);
 	lyrics[lyrics_len] = '\0';
 
+	purify_lyrics();
+
 	/* segment lyrics into token sequence */	
 	((THULAC*)lac)->cut(lyrics, *(THULAC_result*)lyr_token);
 
@@ -134,7 +136,6 @@ void LexicalAnalyzer::print_lyrics() {
     std::cout<<std::endl<<std::endl;
 }
 
-
 /* parse a line in json type, set the position of lyrics */
 /* return 1 if lyrics found, otherwise return 0 */
 int LexicalAnalyzer::find_lyrics(int* start, int* end){
@@ -172,3 +173,42 @@ int LexicalAnalyzer::find_lyrics(int* start, int* end){
 }
 
 
+/* purify lyrics, remove useless symbols */
+void LexicalAnalyzer::purify_lyrics(){
+	if(lyrics == NULL || lyrics[0] == '\0'){
+		return;
+	}	
+
+	char* lyr = new char[lyrics_len + 1];
+	int pos = 0;
+	for(int i = 0; i < lyrics_len; i++){
+		/* utf-8 1-byte code */
+		if(!(lyrics[i] & 0x80)){
+			char c = lyrics[i];
+			if(c == '\\' && (lyrics[i+1] == 'n' || lyrics[i+1] == '\\')){
+				i++;
+				lyr[pos++] = ' ';
+				continue;
+			}
+			if(c == '#' || c == '*' || c == '&' || c == '~'){
+				lyr[pos++] = ' ';
+				continue;
+			}
+			if('A' <= c && c <= 'Z'){
+				lyr[pos++] = c + ('a' - 'A');
+				continue;
+			}
+			lyr[pos++] = lyrics[i]; 				
+		}
+		/*utf-8* 2-byte code */
+		//if(!(lyrics[i] & 0x))
+		else
+			lyr[pos++] = lyrics[i];
+	}
+
+	lyr[pos++] = '\0';
+	lyrics_len = pos;
+	char* tmp = lyrics;
+	lyrics = lyr;
+	delete tmp;
+}

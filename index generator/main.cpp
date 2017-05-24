@@ -65,8 +65,7 @@ int main(int argc, char **args){
 		}
 
 		status = Analyzer.parse_lyrics();
-		Analyzer.print_lyrics();
-
+		//Analyzer.print_lyrics();
 
 		while(1){
 			std::string token = Analyzer.poll_lyrics();
