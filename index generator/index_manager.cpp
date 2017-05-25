@@ -25,14 +25,17 @@ void Entry::add_posting(unsigned long song_id){
 	}
 }
 
-
 /* implementation of IndexManager */
 IndexManager::IndexManager(){
-
+	doc_cnt = 0;
 }
 
+void IndexManager::add_doc(unsigned long song_id){
+	doc_cnt++;
+	current_id = song_id;
+}
 
-void IndexManager::add_posting(std::string str, unsigned long song_id){
+void IndexManager::add_posting(std::string str){
 	std::map<std::string, Entry*>::iterator it;
 	it = Dict.find(str);
 	if(it == Dict.end()){
@@ -44,16 +47,24 @@ void IndexManager::add_posting(std::string str, unsigned long song_id){
 	}
 }
 
+void IndexManager::sort_postings(){
+	std::map<std::string, Entry*>::iterator ent;
+	std::map<unsigned long, Posting*>::iterator post;
+	for(ent = Dict.begin(); ent != Dict.end(); ent++){
+
+
+	}
+}
 
 void IndexManager::print_postings(){
-	std::map<std::string, Entry*>::iterator dict;
-	std::map<unsigned long, Posting*>::iterator ent;
+	std::map<std::string, Entry*>::iterator ent;
+	std::map<unsigned long, Posting*>::iterator post;
 	std::map<unsigned long, Posting*>* list;
-	for(dict = Dict.begin(); dict != Dict.end(); dict++){
-		std::cout<<dict->first<<","<<dict->second->doc_freq<<' ';
-		list = &(dict->second->List);
-		for(ent = list->begin(); ent != list->end(); ent++){
-			std::cout<<ent->first<<':'<<ent->second->term_freq<<" ";
+	for(ent = Dict.begin(); ent != Dict.end(); ent++){
+		std::cout<<ent->first<<","<<ent->second->doc_freq<<' ';
+		list = &(ent->second->List);
+		for(post = list->begin(); post != list->end(); post++){
+			std::cout<<post->first<<':'<<post->second->term_freq<<" ";
 		}
 		std::cout<<std::endl;
 	}

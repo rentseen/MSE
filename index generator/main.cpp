@@ -67,6 +67,7 @@ int main(int argc, char **args){
 		status = Analyzer.parse_lyrics();
 		//Analyzer.print_lyrics();
 
+		Indexer.add_doc();
 		while(1){
 			std::string token = Analyzer.poll_lyrics();
 			if(token.size() == 0)
