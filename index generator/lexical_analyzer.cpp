@@ -211,24 +211,40 @@ void LexicalAnalyzer::purify_lyrics(){
 		/*utf-8* 3-byte code, chinese */
 		else if((lyrics[i] & 0xF0) == 0xE0 && (i + 3 < lyrics_len)){
 			char c0 = lyrics[i], c1 = lyrics[i+1], c2 = lyrics[i+2];
-			/* . , : in chinese */
-			if( c0 == char(0xE3) && c1 == char(0x80) && c2 == char(0x82) || /* . */
-				c0 == char(0xEF) && c1 == char(0xBC) && c2 == char(0x8C) || /* , */
-				c0 == char(0xEF) && c1 == char(0xBC) && c2 == char(0x9A) ){ /* : */
-				lyr[pos++] = ' ';
-				i += 2;
-			}
+
 			/* english captial letter in chinese coding */
-			else if( c0 == char(0xEF) && c1 == char(0xBC) && 
+			if( c0 == char(0xEF) && c1 == char(0xBC) && 
 				char(0xA1) <= c2 && c2 <= char(0xBA) ){
 				lyr[pos++] = 'a' + c2 - char(0xA1);
 				i += 2;
 			}
 			/* english small letter in chinese coding */
 			else if( c0 == char(0xEF) && c1 == char(0xBD) && 
-				char(0x81) <= c2 && c2 <= char(0x9A) ){
+				char(0x81) <= c2 && c2 <= char(0x9A)){
 				lyr[pos++] = 'a' + c2 - char(0x81);
 				i += 2;
+			}
+			/* arabic number in chinese coding */
+			else if( c0 == char(0xEF) && c1 == char(0xBC) &&
+				char(0x90) <= c2 && c2 <= char(0x99)){
+				lyr[pos++] == '0' + c2 - char(0x90);
+				i += 2;
+			}
+			/* useless symbols in chinese coding */
+			else if( 
+				c0 == char(0xE3) && c1 == char(0x80) || 	/* seg 0 */
+				c0 == char(0xEF) && c1 == char(0xBC) && (	/* seg 1 */
+				char(0x80) <= c2 && c2 <= char(0x8F) ||
+				char(0x9A) <= c2 && c2 <= char(0xA0) ||
+				char(0xBB) <= c2 && c2 <= char(0xBF) )||
+				c0 == char(0xEF) && c1 == char(0xBD) && 	/* seg 2 */
+				(c2 == char(0x80) || char(0x9B) <= c2 && c2 <= char(0xA5))){
+				lyr[pos++] = ' ';
+				i += 2;
+			}
+			else if(c0 == char(0xEF) && c1 == char(0xBD) &&
+				(char(0x9B) <= c2 && c2 <= char(0xA5))){
+
 			}
 			else{
 				lyr[pos++] = lyrics[i++];
