@@ -6,26 +6,34 @@
 
 /* posting records term-doc association */
 struct Posting{
-
 	unsigned long song_id;
 	unsigned term_freq;
-
 };
 
-bool operator<(Posting a, Posting b){
-
-}
+struct compare{
+	bool operator()(Posting* a, Posting* b) const{
+		if(a->term_freq == b->term_freq)
+			return (a->song_id < b->song_id);
+		return (a->term_freq < b->term_freq);
+	}
+};
 
 /* entry records a term and its posting list */
 class Entry{
 public:	
-	unsigned current_tf; /* term freq of current doc */
-	unsigned doc_freq; 
+	unsigned current_tf;	/* term freq of current doc */
+	unsigned doc_freq; 	/* number of docs the word appears in */
 	std::string word;
 //	std::map<unsigned long, Posting*> List;
-	std::priority_queue<Posting*> List;
-	Entry(std::string str, unsigned long song_id);
-	void add_posting(unsigned long song_id);
+	std::priority_queue<Posting*, std::vector<Posting*>, compare> List;
+	
+	Entry(std::string str);
+	
+	/* add term frequence */
+	void add_term_freq();
+
+	/* merge doc_id into posting list*/
+	void merge_posting(unsigned long song_id);
 };
 
 
@@ -33,7 +41,7 @@ public:
 class IndexManager{
 private:
 	unsigned doc_cnt;
-	unsigned long current_id;
+//	unsigned long current_id;
 	std::map<std::string, Entry*> Dict;
 
 
@@ -41,7 +49,8 @@ public:
 
 	IndexManager();
 
-	void add_doc(unsigned long song_id);
+	/* merge current doc's postings */
+	void finish_doc(unsigned long song_id);
 	
 	void add_posting(std::string str);
 

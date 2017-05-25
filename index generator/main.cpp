@@ -67,16 +67,16 @@ int main(int argc, char **args){
 		status = Analyzer.parse_lyrics();
 		//Analyzer.print_lyrics();
 
-		Indexer.add_doc();
 		while(1){
 			std::string token = Analyzer.poll_lyrics();
 			if(token.size() == 0)
 				break;
 			
-			Indexer.add_posting(token, song_id);
+			Indexer.add_posting(token);
 
 		}
-
+		
+		Indexer.finish_doc(song_id);
 
 		Analyzer.clean();
 		cnt ++;

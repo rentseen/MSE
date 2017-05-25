@@ -182,7 +182,7 @@ void LexicalAnalyzer::purify_lyrics(){
 	char* lyr = new char[lyrics_len + 1];
 	int pos = 0;
 	for(int i = 0; i < lyrics_len; i++){
-		/* utf-8 1-byte code */
+		/* utf-8 1-byte code, ascii */
 		if(!(lyrics[i] & 0x80)){
 			char c = lyrics[i];
 
@@ -208,7 +208,7 @@ void LexicalAnalyzer::purify_lyrics(){
 			else
 				lyr[pos++] = ' '; 				
 		}
-		/*utf-8* 3-byte code */
+		/*utf-8* 3-byte code, chinese */
 		else if((lyrics[i] & 0xF0) == 0xE0 && (i + 3 < lyrics_len)){
 			char c0 = lyrics[i], c1 = lyrics[i+1], c2 = lyrics[i+2];
 			/* . , : in chinese */
