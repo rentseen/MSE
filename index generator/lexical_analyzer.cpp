@@ -185,23 +185,57 @@ void LexicalAnalyzer::purify_lyrics(){
 		/* utf-8 1-byte code */
 		if(!(lyrics[i] & 0x80)){
 			char c = lyrics[i];
-			if(c == '\\' && (lyrics[i+1] == 'n' || lyrics[i+1] == '\\')){
-				i++;
-				lyr[pos++] = ' ';
-				continue;
+
+			if('a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '-'){
+				lyr[pos++] = c;
 			}
-			if(c == '#' || c == '*' || c == '&' || c == '~'){
-				lyr[pos++] = ' ';
-				continue;
-			}
-			if('A' <= c && c <= 'Z'){
+			/* change capital to small letter */
+			else if('A' <= c && c <= 'Z'){
 				lyr[pos++] = c + ('a' - 'A');
-				continue;
 			}
-			lyr[pos++] = lyrics[i]; 				
+			/* special symbols begin with '\\' */
+			else if(c == '\\'){
+				/* omit '\n', '\\' */	
+				if(lyrics[i+1] == 'n' || lyrics[i+1] == '\\')
+					i++;
+				/* omit '\uXXX' */
+				else if(lyrics[i+1] == 'u' && i + 5 < lyrics_len)
+					i += 5;
+				
+				lyr[pos++] = ' ';
+			}
+			/* omit meanless symbols not begin with '\\' */
+			else
+				lyr[pos++] = ' '; 				
 		}
-		/*utf-8* 2-byte code */
-		//if(!(lyrics[i] & 0x))
+		/*utf-8* 3-byte code */
+		else if((lyrics[i] & 0xF0) == 0xE0 && (i + 3 < lyrics_len)){
+			char c0 = lyrics[i], c1 = lyrics[i+1], c2 = lyrics[i+2];
+			/* . , : in chinese */
+			if( c0 == char(0xE3) && c1 == char(0x80) && c2 == char(0x82) || /* . */
+				c0 == char(0xEF) && c1 == char(0xBC) && c2 == char(0x8C) || /* , */
+				c0 == char(0xEF) && c1 == char(0xBC) && c2 == char(0x9A) ){ /* : */
+				lyr[pos++] = ' ';
+				i += 2;
+			}
+			/* english captial letter in chinese coding */
+			else if( c0 == char(0xEF) && c1 == char(0xBC) && 
+				char(0xA1) <= c2 && c2 <= char(0xBA) ){
+				lyr[pos++] = 'a' + c2 - char(0xA1);
+				i += 2;
+			}
+			/* english small letter in chinese coding */
+			else if( c0 == char(0xEF) && c1 == char(0xBD) && 
+				char(0x81) <= c2 && c2 <= char(0x9A) ){
+				lyr[pos++] = 'a' + c2 - char(0x81);
+				i += 2;
+			}
+			else{
+				lyr[pos++] = lyrics[i++];
+				lyr[pos++] = lyrics[i++];
+				lyr[pos++] = lyrics[i];
+			}
+		}
 		else
 			lyr[pos++] = lyrics[i];
 	}
