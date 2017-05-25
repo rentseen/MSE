@@ -87,6 +87,7 @@ int main(int argc, char **args){
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 	printf("Totally, taken %lf seconds\n\n", duration);
 	
+	Indexer.sort_postings();
 	Indexer.print_postings();
 
 	closedir(pDir);

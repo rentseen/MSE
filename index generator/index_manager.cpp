@@ -8,9 +8,6 @@
 */
 
 Entry::Entry(std::string str) : word(str){	
-	//Posting* post = new Posting;
-	//post->term_freq = 1;
-	//List.insert(std::pair<unsigned long, Posting*>(song_id, post));
 	current_tf = 1;
 	doc_freq = 0;
 }
@@ -26,10 +23,23 @@ void Entry::merge_posting(unsigned long song_id){
 	Posting* post = new Posting;
 	post->term_freq = current_tf;
 	post->song_id = song_id;
-	List.push(post);
+	List.push_back(post);
 	
 	doc_freq++;
 	current_tf = 0;	
+}
+
+void Entry::sort_postings(){
+	compare cmp;
+	std::sort(List.begin(), List.end(), cmp);
+}
+
+void Entry::print_postings(){
+	std::vector<Posting*>::iterator it;
+	for(it = List.begin(); it != List.end(); it++){
+		std::cout<<(*it)->song_id<<':'<<(*it)->term_freq<<' ';
+	}
+	std::cout<<std::endl;
 }
 
 
@@ -38,6 +48,17 @@ void Entry::merge_posting(unsigned long song_id){
 */
 IndexManager::IndexManager(){
 	doc_cnt = 0;
+}
+
+void IndexManager::finish_doc(unsigned long song_id){
+	/* merge old doc's postings */
+	if(doc_cnt > 0){
+		std::map<std::string, Entry*>::iterator it;
+		for(it = Dict.begin(); it != Dict.end(); it++){
+			it->second->merge_posting(song_id);
+		}
+	}
+	doc_cnt++;
 }
 
 void IndexManager::add_posting(std::string str){
@@ -52,31 +73,19 @@ void IndexManager::add_posting(std::string str){
 	}
 }
 
-void IndexManager::finish_doc(unsigned long song_id){
-	/* merge old doc's postings */
-	if(doc_cnt > 0){
-		std::map<std::string, Entry*>::iterator it;
-		for(it = Dict.begin(); it != Dict.end(); it++){
-			it->second->merge_posting(song_id);
-		}
-	}
+void IndexManager::sort_postings(){
+	std::map<std::string, Entry*>::iterator ent;
 
-	doc_cnt++;
+	for(ent = Dict.begin(); ent != Dict.end(); ent++)
+		ent->second->sort_postings();
 }
 
 void IndexManager::print_postings(){
 	std::map<std::string, Entry*>::iterator ent;
-	std::priority_queue<Posting*, std::vector<Posting*>, compare>* list;
-	Posting* post;
 
 	for(ent = Dict.begin(); ent != Dict.end(); ent++){
 		std::cout<<ent->first<<":"<<ent->second->doc_freq<<' ';
-		list = &(ent->second->List);
-		while(!list->empty()){
-			post = list->top();
-			std::cout<<post->song_id<<':'<<post->term_freq<<" ";
-			list->pop();
-		}
-		std::cout<<std::endl;
+		ent->second->print_postings();
+		
 	}
 }

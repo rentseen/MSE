@@ -2,7 +2,8 @@
 #define INDEX_MANAGER_H
 
 #include <map>
-#include <queue>
+#include <vector>
+#include <algorithm>
 
 /* posting records term-doc association */
 struct Posting{
@@ -12,9 +13,7 @@ struct Posting{
 
 struct compare{
 	bool operator()(Posting* a, Posting* b) const{
-		if(a->term_freq == b->term_freq)
-			return (a->song_id < b->song_id);
-		return (a->term_freq < b->term_freq);
+		return (a->term_freq > b->term_freq);
 	}
 };
 
@@ -25,8 +24,8 @@ public:
 	unsigned doc_freq; 	/* number of docs the word appears in */
 	std::string word;
 //	std::map<unsigned long, Posting*> List;
-	std::priority_queue<Posting*, std::vector<Posting*>, compare> List;
-	
+//	std::priority_queue<Posting*, std::vector<Posting*>, compare> List;
+	std::vector<Posting*> List;	
 	Entry(std::string str);
 	
 	/* add term frequence */
@@ -34,6 +33,11 @@ public:
 
 	/* merge doc_id into posting list*/
 	void merge_posting(unsigned long song_id);
+
+	/* sort postings according to tf */
+	void sort_postings();
+
+	void print_postings();
 };
 
 
@@ -54,45 +58,11 @@ public:
 	
 	void add_posting(std::string str);
 
+	void sort_postings();
+
 	void print_postings();
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

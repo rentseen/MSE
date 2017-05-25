@@ -186,7 +186,7 @@ void LexicalAnalyzer::purify_lyrics(){
 		if(!(lyrics[i] & 0x80)){
 			char c = lyrics[i];
 
-			if('a' <= c && c <= 'z' || '0' <= c && c <= '9' || c == '-'){
+			if('a' <= c && c <= 'z' || '0' <= c && c <= '9'){
 				lyr[pos++] = c;
 			}
 			/* change capital to small letter */
@@ -232,11 +232,13 @@ void LexicalAnalyzer::purify_lyrics(){
 			}
 			/* useless symbols in chinese coding */
 			else if( 
-				c0 == char(0xE3) && c1 == char(0x80) || 	/* seg 0 */
-				c0 == char(0xEF) && c1 == char(0xBC) && (	/* seg 1 */
-				char(0x80) <= c2 && c2 <= char(0x8F) ||
-				char(0x9A) <= c2 && c2 <= char(0xA0) ||
-				char(0xBB) <= c2 && c2 <= char(0xBF) )||
+				(c0 == char(0xE3) && c1 == char(0x80)) || 	/* seg 0 */
+				
+				(c0 == char(0xEF) && c1 == char(0xBC) && (	/* seg 1 */
+				(char(0x80) <= c2 && c2 <= char(0x8F)) ||
+				(char(0x9A) <= c2 && c2 <= char(0xA0)) ||
+				(char(0xBB) <= c2 && c2 <= char(0xBF)) )) ||
+				
 				c0 == char(0xEF) && c1 == char(0xBD) && 	/* seg 2 */
 				(c2 == char(0x80) || char(0x9B) <= c2 && c2 <= char(0xA5))){
 				lyr[pos++] = ' ';
