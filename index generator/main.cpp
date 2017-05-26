@@ -67,6 +67,8 @@ int main(int argc, char **args){
 		status = Analyzer.parse_lyrics();
 		//Analyzer.print_lyrics();
 
+		Indexer.new_doc(song_id);
+
 		while(1){
 			std::string token = Analyzer.poll_lyrics();
 			if(token.size() == 0)
@@ -75,19 +77,18 @@ int main(int argc, char **args){
 			Indexer.add_posting(token);
 
 		}
-		
-		Indexer.finish_doc(song_id);
 
 		Analyzer.clean();
 		cnt ++;
 	
 	}
 
+	Indexer.sort_postings();
+
 	clock_t clock_end = clock();
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 	printf("Totally, taken %lf seconds\n\n", duration);
 	
-	Indexer.sort_postings();
 	Indexer.print_postings();
 
 	closedir(pDir);

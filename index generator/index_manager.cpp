@@ -8,25 +8,24 @@
 */
 
 Entry::Entry(std::string str) : word(str){	
-	current_tf = 1;
+	current_id = 0;
 	doc_freq = 0;
 }
 
-void Entry::add_term_freq(){
-	current_tf++;
-}
+void Entry::add_posting(unsigned long song_id){
+	if(current_id != song_id){
+		Posting* post = new Posting;
+		post->term_freq = 1;
+		post->song_id = song_id;
+		List.push_back(post);
 
-void Entry::merge_posting(unsigned long song_id){
-	if(current_tf == 0)
-		return;
-
-	Posting* post = new Posting;
-	post->term_freq = current_tf;
-	post->song_id = song_id;
-	List.push_back(post);
-	
-	doc_freq++;
-	current_tf = 0;	
+		current_id = song_id;
+		doc_freq++;
+	}
+	else{
+		std::vector<Posting*>::iterator it = List.end() - 1;
+		(*it)->term_freq++;
+	}
 }
 
 void Entry::sort_postings(){
@@ -47,17 +46,12 @@ void Entry::print_postings(){
 * implementation of IndexManager 
 */
 IndexManager::IndexManager(){
+	current_id = 0;
 	doc_cnt = 0;
 }
 
-void IndexManager::finish_doc(unsigned long song_id){
-	/* merge old doc's postings */
-	if(doc_cnt > 0){
-		std::map<std::string, Entry*>::iterator it;
-		for(it = Dict.begin(); it != Dict.end(); it++){
-			it->second->merge_posting(song_id);
-		}
-	}
+void IndexManager::new_doc(unsigned long song_id){
+	current_id = song_id;
 	doc_cnt++;
 }
 
@@ -65,11 +59,12 @@ void IndexManager::add_posting(std::string str){
 	std::map<std::string, Entry*>::iterator it;
 	it = Dict.find(str);
 	if(it == Dict.end()){
-		Entry* entry = new Entry(str);
-		Dict.insert(std::pair<std::string, Entry*>(str, entry));
+		Entry* ent = new Entry(str);
+		ent->add_posting(current_id);
+		Dict.insert(std::pair<std::string, Entry*>(str, ent));
 	}	
 	else{
-		it->second->add_term_freq();
+		it->second->add_posting(current_id);
 	}
 }
 

@@ -20,19 +20,14 @@ struct compare{
 /* entry records a term and its posting list */
 class Entry{
 public:	
-	unsigned current_tf;	/* term freq of current doc */
+	unsigned long current_id;	/* current song id */
 	unsigned doc_freq; 	/* number of docs the word appears in */
 	std::string word;
-//	std::map<unsigned long, Posting*> List;
-//	std::priority_queue<Posting*, std::vector<Posting*>, compare> List;
+
 	std::vector<Posting*> List;	
 	Entry(std::string str);
 	
-	/* add term frequence */
-	void add_term_freq();
-
-	/* merge doc_id into posting list*/
-	void merge_posting(unsigned long song_id);
+	void add_posting(unsigned long song_id);
 
 	/* sort postings according to tf */
 	void sort_postings();
@@ -45,7 +40,7 @@ public:
 class IndexManager{
 private:
 	unsigned doc_cnt;
-//	unsigned long current_id;
+	unsigned long current_id;
 	std::map<std::string, Entry*> Dict;
 
 
@@ -53,8 +48,7 @@ public:
 
 	IndexManager();
 
-	/* merge current doc's postings */
-	void finish_doc(unsigned long song_id);
+	void new_doc(unsigned long song_id);
 	
 	void add_posting(std::string str);
 
