@@ -209,7 +209,7 @@ void LexicalAnalyzer::purify_lyrics(){
 				lyr[pos++] = ' '; 				
 		}
 		/*utf-8* 3-byte code, chinese */
-		else if((lyrics[i] & 0xF0) == 0xE0 && (i + 3 < lyrics_len)){
+		else if((lyrics[i] & 0xF0) == 0xE0 && (i + 2 < lyrics_len)){
 			char c0 = lyrics[i], c1 = lyrics[i+1], c2 = lyrics[i+2];
 
 			/* english captial letter in chinese coding */
@@ -233,20 +233,21 @@ void LexicalAnalyzer::purify_lyrics(){
 			/* useless symbols in chinese coding */
 			else if( 
 				(c0 == char(0xE3) && c1 == char(0x80)) || 	/* seg 0 */
+
+				(c0 == char(0xEF) && c1 == char(0xB9)) ||	/* seg 1 */
 				
-				(c0 == char(0xEF) && c1 == char(0xBC) && (	/* seg 1 */
+				(c0 == char(0xEF) && c1 == char(0xBC) && (	/* seg 2 */
 				(char(0x80) <= c2 && c2 <= char(0x8F)) ||
 				(char(0x9A) <= c2 && c2 <= char(0xA0)) ||
 				(char(0xBB) <= c2 && c2 <= char(0xBF)) )) ||
 				
-				c0 == char(0xEF) && c1 == char(0xBD) && 	/* seg 2 */
-				(c2 == char(0x80) || char(0x9B) <= c2 && c2 <= char(0xA5))){
+				(c0 == char(0xEF) && c1 == char(0xBD) && 	/* seg 3 */
+				(char(0x9B) <= c2 && c2 <= char(0xA5)) || c2 == char(0x80)) ||
+				
+				(c0 == char(0xEF) && c1 == char(0xBF)) ){   /* seg 4  */
+				
 				lyr[pos++] = ' ';
 				i += 2;
-			}
-			else if(c0 == char(0xEF) && c1 == char(0xBD) &&
-				(char(0x9B) <= c2 && c2 <= char(0xA5))){
-
 			}
 			else{
 				lyr[pos++] = lyrics[i++];
