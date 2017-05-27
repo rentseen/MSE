@@ -13,7 +13,7 @@ struct Posting{
 
 struct compare{
 	bool operator()(Posting* a, Posting* b) const{
-		return (a->term_freq > b->term_freq);
+		return (a->song_id < b->song_id);
 	}
 };
 
