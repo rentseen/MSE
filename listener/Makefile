@@ -11,10 +11,8 @@ FFMPEG_LIBS=    libavdevice                        \
                 libswscale                         \
                 libavutil                          \
 
-PKG_CFG_LIBS=   x11                                \
-                vdpau                              \
-                libva                              \
-                $(FFMPEG_LIBS)
+PKG_CFG_LIBS=   cairo $(FFMPEG_LIBS)
+            	
 
 
 CFLAGS += -Wall -g
