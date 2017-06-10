@@ -22,13 +22,18 @@ extern "C"
 // used for FFT
 const double PI = 3.141592653589793238460;
 
-
-class KeyWaves{	
+// info of a wave
+class Wave{
 public:
-	// X_k in FFT
-	//Complex waves[8];
-	// index of waves in FFT
-	int index[8];
+	double real; 	// real part of fft K
+	double imag;	// imag part of fft K
+	int index;	// index in fft
+
+	Wave(double r = 0, double i = 0, int k = 0) : real(r), imag(i), index(k) {}
+
+	double square() {
+		return pow(real, 2) + pow(imag, 2);
+	}
 };
 
 
@@ -43,21 +48,22 @@ private:
 
     // decoded samples of a frame, and waves by fft
     int nb_samples;
-    int nb_slice;
-    int16_t *samples = NULL;
-    //CArray *waves = NULL;
+    int16_t *samples;
 
-    //std::vector<double> real;
-    //std::vector<double> imag;
-
-    KeyWaves keywaves;
+	// align nb_samples to power of 2
+	int nb_slices;
+    
+    // key waves get by fft
+    int nb_waves;
+    Wave *keywaves;
 
 	// alloc and set samples of a frame
 	int get_samples();
 
 	// use cairo to draw frames
 	void draw_samples(cairo_t *cr);
-	void draw_waves(cairo_t *cr, double real, double imag, int k);
+	void draw_awave(cairo_t *cr, Wave wave);
+	void draw_kwaves(cairo_t *cr, int k);
 
 
 public:
@@ -71,8 +77,8 @@ public:
 	// parse a frame: decode, fft, return nb_samples
 	int poll_frames();
 
-	// draw samples, key waves
-	void draw_frames(const char *file_path, int maxk);
+	// draw samples, k key waves
+	void draw_frames(const char *file_path, int k);
 
 	void close_file();
 

@@ -14,7 +14,7 @@ int main()
 		maxk = Waver.poll_frames();
 	}
 
-	Waver.draw_frames("helloworld.png", maxk);
+	Waver.draw_frames("helloworld.png", 4);
 
 
     //std::cout << "finished" << std::endl;
