@@ -19,7 +19,7 @@ CFLAGS += -Wall -g
 CFLAGS := $(shell pkg-config --cflags $(PKG_CFG_LIBS)) $(CFLAGS)
 LDLIBS := $(shell pkg-config --libs $(PKG_CFG_LIBS)) $(LDLIBS)
 
-Source=main.cpp wave_explorer.cpp
+Source=main.cpp wave_explorer.cpp fft.cpp
 
 all: $(Objects)
 	$(CC) $(Source) $(INC) $(LIB) $(LDLIBS)

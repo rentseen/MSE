@@ -10,14 +10,12 @@ int main()
 
 	int maxk;
 	
-	for (int i = 0; i < 5000; i++){
+	for (int i = 0; i < 4000; i++){
 		maxk = Waver.poll_frames();
 	}
 
-	Waver.draw_frames("helloworld.png", 4);
+	Waver.draw_frames("helloworld.png", 32);
 
-
-    //std::cout << "finished" << std::endl;
 	
 	Waver.close_file();
 

@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-//#include <complex>
 #include <math.h>
 
 #include <cairo/cairo.h>
@@ -17,23 +16,36 @@ extern "C"
 	//#include "libavutil/mathematics.h"
 }
 
-//typedef std::complex<double> Complex;
 
-// used for FFT
-const double PI = 3.141592653589793238460;
 
 // info of a wave
 class Wave{
 public:
+	// encodes both amplitude and phase
 	double real; 	// real part of fft K
 	double imag;	// imag part of fft K
-	int index;	// index in fft
+	int index;		// index in fft
 
 	Wave(double r = 0, double i = 0, int k = 0) : real(r), imag(i), index(k) {}
 
 	double square() {
 		return pow(real, 2) + pow(imag, 2);
 	}
+};
+
+class WaveSequece{
+public:
+	int nb_waves;
+	std::vector<double> real;
+	std::vector<double> imag;
+	std::vector<int> index;
+
+	void fill(int16_t *samples, int nb_samples);
+
+	WaveSequece();
+	void fast_fourier_transform(int16_t *samples, int nb_samples);
+	void sort_waves();
+	void print_waves();
 };
 
 
@@ -49,13 +61,8 @@ private:
     // decoded samples of a frame, and waves by fft
     int nb_samples;
     int16_t *samples;
-
-	// align nb_samples to power of 2
-	int nb_slices;
     
-    // key waves get by fft
-    int nb_waves;
-    Wave *keywaves;
+    WaveSequece waves;
 
 	// alloc and set samples of a frame
 	int get_samples();
@@ -64,7 +71,6 @@ private:
 	void draw_samples(cairo_t *cr);
 	void draw_awave(cairo_t *cr, Wave wave);
 	void draw_kwaves(cairo_t *cr, int k);
-
 
 public:
 
@@ -82,8 +88,6 @@ public:
 
 	void close_file();
 
-
 };
-
 
 #endif
