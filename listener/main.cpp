@@ -10,11 +10,11 @@ int main()
 
 	int maxk;
 	
-	for (int i = 0; i < 4000; i++){
-		maxk = Waver.poll_frames();
+	for (int i = 0; i < 40; i++){
+		maxk = Waver.next_second();
 	}
 
-	Waver.draw_frames("helloworld.png", 32);
+	Waver.draw_frames("helloworld.png", 256);
 
 	
 	Waver.close_file();

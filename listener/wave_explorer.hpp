@@ -7,6 +7,8 @@
 
 #include <cairo/cairo.h>
 
+#define NB_SAMPLES_PER_SECOND 	44100
+
 extern "C" 
 {
 	#include "libavcodec/avcodec.h"
@@ -18,21 +20,6 @@ extern "C"
 
 
 
-// info of a wave
-class Wave{
-public:
-	// encodes both amplitude and phase
-	double real; 	// real part of fft K
-	double imag;	// imag part of fft K
-	int index;		// index in fft
-
-	Wave(double r = 0, double i = 0, int k = 0) : real(r), imag(i), index(k) {}
-
-	double square() {
-		return pow(real, 2) + pow(imag, 2);
-	}
-};
-
 class WaveSequece{
 public:
 	int nb_waves;
@@ -40,10 +27,8 @@ public:
 	std::vector<double> imag;
 	std::vector<int> index;
 
-	void fill(int16_t *samples, int nb_samples);
-
 	WaveSequece();
-	void fast_fourier_transform(int16_t *samples, int nb_samples);
+	void fast_fourier_transform(std::vector<int> samples, int nb_samples);
 	void sort_waves();
 	void print_waves();
 };
@@ -58,18 +43,20 @@ private:
     AVFrame *frame;
     AVPacket packet;
 
+    bool empty_song;
+
     // decoded samples of a frame, and waves by fft
     int nb_samples;
-    int16_t *samples;
+    std::vector<int> samples;
+    int next_sample_pos;
     
     WaveSequece waves;
 
 	// alloc and set samples of a frame
-	int get_samples();
+	int next_second_samples();
 
 	// use cairo to draw frames
 	void draw_samples(cairo_t *cr);
-	void draw_awave(cairo_t *cr, Wave wave);
 	void draw_kwaves(cairo_t *cr, int k);
 
 public:
@@ -81,7 +68,7 @@ public:
 	int load_file(const char *file_path);
 
 	// parse a frame: decode, fft, return nb_samples
-	int poll_frames();
+	int next_second();
 
 	// draw samples, k key waves
 	void draw_frames(const char *file_path, int k);

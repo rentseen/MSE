@@ -1,6 +1,9 @@
 #include "wave_explorer.hpp"
 #include "fft.hpp"
 
+#define IMAGE_WIDTH     7350
+#define IMAGE_HEIGHT    4200
+
 const double PI = 3.141592653589793238460;
 
 WaveSequece::WaveSequece()
@@ -8,7 +11,7 @@ WaveSequece::WaveSequece()
     nb_waves = 0;
 }
 
-void WaveSequece::fill(int16_t *samples, int nb_samples)
+void WaveSequece::fast_fourier_transform(std::vector<int> samples, int nb_samples)
 {
     nb_waves = nb_samples;
     real.resize(nb_waves);
@@ -17,14 +20,10 @@ void WaveSequece::fill(int16_t *samples, int nb_samples)
 
     for (int i = 0; i < nb_waves; i++) {
         real[i] = double(samples[i]);
-        imag[i] = 0;
+        imag[i] = 0; 
         index[i] = i;
     }
-}
 
-void WaveSequece::fast_fourier_transform(int16_t *samples, int nb_samples)
-{
-    fill(samples, nb_samples);
     Fft::transform(real, imag);
 }
 
@@ -100,8 +99,11 @@ WaveExplorer::WaveExplorer()
         std::cout << "Error could not alloc frame" << std::endl;
     }
 
+    empty_song = false;
+
     nb_samples = 0;
-    samples = NULL;
+    samples.resize(NB_SAMPLES_PER_SECOND);
+    next_sample_pos = -1;
 }
 
 WaveExplorer::~WaveExplorer() 
@@ -158,9 +160,9 @@ int WaveExplorer::load_file(const char *file)
 void WaveExplorer::close_file() 
 {
     avformat_close_input(&format_ctx);
-    delete samples;
 }
 
+/*
 int WaveExplorer::get_samples() 
 {
     if (av_read_frame(format_ctx, &packet) < 0 || packet.size <= 0) {
@@ -206,38 +208,70 @@ int WaveExplorer::get_samples()
     av_free_packet(&packet);
     return 0;
 }
+*/
 
-/*
-void fft(double *xr, double *xi, double *yr, double *yi, int N, int step)
+void get_frame_samples(AVFrame *frame, int &next_sample_pos, std::vector<int> &samples, int &nb_samples)
 {
-    if (step < N) {
-        fft(yr, yi, xr, xi, N, step * 2);
-        fft(yr + step, yi + step, xr + step, xi + step, N, step * 2);
- 
-        for (int i = 0; i < N; i += 2 * step) {
-            double cosa = cos(-2 * PI * i / N);
-            double sina = sin(-2 * PI * i / N);
-            double tr = cosa * yr[i + step] - sina * yi[i + step];
-            double ti = cosa * yi[i + step] + sina * yr[i + step];
-            xr[i / 2]     = yr[i] + tr;
-            xi[i / 2]     = yi[i] + ti;
-            xr[(i + N)/2] = yr[i] - tr;
-            xi[(i + N)/2] = yi[i] - ti;
-        }
+    switch (frame->format) {
+        case AV_SAMPLE_FMT_S16P:
+            for (; next_sample_pos < frame->nb_samples && nb_samples < NB_SAMPLES_PER_SECOND; next_sample_pos++) {
+                int16_t value = 0;
+                value |= frame->data[0][next_sample_pos*2+1];
+                value <<= 8;
+                value |= frame->data[0][next_sample_pos*2];
+                samples[nb_samples++] = (int16_t)value;
+                //std::cout << samples[i] << ' ';
+            }
     }
 }
 
-*/
 
-
-int WaveExplorer::poll_frames()
+int WaveExplorer::next_second_samples() 
 {
-    if (get_samples()) {
+    nb_samples = 0;
+    while (nb_samples < NB_SAMPLES_PER_SECOND) {
+        if (next_sample_pos == -1) {
+            if (av_read_frame(format_ctx, &packet) < 0 || packet.size <= 0) {
+                empty_song = true;
+                return 1;
+            }
+
+            int got_frame;
+            if (avcodec_decode_audio4(codec_ctx, frame, &got_frame, &packet) < 0) {
+                std::cout << "Error while decoding 1" << std::endl;
+                empty_song = true;
+                return 1;
+            }
+            if (!got_frame) {
+                empty_song = true;
+                return 1;
+            } else {
+                empty_song = false;
+            }
+        }
+
+        get_frame_samples(frame, next_sample_pos, samples, nb_samples);
+    
+        if (next_sample_pos >= frame->nb_samples) {        
+            av_frame_unref(frame);
+            av_free_packet(&packet);
+            next_sample_pos = -1;
+        }
+        
+    }
+
+    return 0;
+}
+
+
+int WaveExplorer::next_second()
+{
+    if (next_second_samples()) {
         return 0;
     }
 
-    //waves.fill(samples, nb_samples);
     waves.fast_fourier_transform(samples, nb_samples);
+    waves.sort_waves();
 
     return 0;
 }
@@ -248,36 +282,22 @@ int WaveExplorer::poll_frames()
 void WaveExplorer::draw_samples(cairo_t *cr)
 {
     for (int i = 0; i < nb_samples; i++) {
-        cairo_move_to(cr, i, 350);
-        cairo_line_to(cr, i, 350 - ((int)samples[i] / 100));
+        int x0 = i % IMAGE_WIDTH;
+        int y0 = 400 + 800 * (i / IMAGE_WIDTH);
+        cairo_move_to(cr, x0, y0);
+        cairo_line_to(cr, x0, y0 - ((int)samples[i] / 40));
     }
     cairo_stroke(cr);
 }
 
-void WaveExplorer::draw_awave(cairo_t *cr, Wave wave) 
-{
-    int N = waves.nb_waves;
-    double scale = - sqrt((pow(wave.real, 2) + pow(wave.imag, 2))) / 100 / N;
-    double alpha = 2.0 * PI * wave.index / N;
-    double theta = atan2(wave.imag, wave.real);
-
-    for (int i = 0; i < nb_samples; i++) {   
-        double value = scale * cos(alpha * i + theta);
-        cairo_move_to(cr, i, 348 + value);
-        cairo_line_to(cr, i, 352 + value);
-    }
-
-    cairo_stroke(cr);
-}
 
 void WaveExplorer::draw_kwaves(cairo_t *cr, int k) 
 {
-    waves.sort_waves();
-
+    std::cout << "draw_kwaves, nb_waves=" << waves.nb_waves << std::endl;
     int N = waves.nb_waves;
     double scale[k], alpha[k], theta[k];
     for (int i = 0; i < k; i++) {
-        scale[i] = - sqrt((pow(waves.real[i], 2) + pow(waves.imag[i], 2))) / 100 / N;
+        scale[i] = - sqrt((pow(waves.real[i], 2) + pow(waves.imag[i], 2))) / 40 / N;
         alpha[i] = 2.0 * PI * waves.index[i] / N;
         theta[i] = atan2(waves.imag[i], waves.real[i]);
     }
@@ -287,9 +307,12 @@ void WaveExplorer::draw_kwaves(cairo_t *cr, int k)
         for (int j = 0; j < k; j++) {
             value +=  scale[j] * cos(alpha[j] * i + theta[j]);
         }
+
+        int x0 = i % IMAGE_WIDTH;
+        int y0 = 400 + 800 * (i / IMAGE_WIDTH);
         
-        cairo_move_to(cr, i, 349 + value);
-        cairo_line_to(cr, i, 351 + value);
+        cairo_move_to(cr, x0, y0 + value - 2);
+        cairo_line_to(cr, x0, y0 + value + 2);
     }
 
     cairo_stroke(cr);
@@ -301,7 +324,7 @@ void WaveExplorer::draw_frames(const char *file_path, int k)
         std::cout << "Error too large keywaves wanted by k" << std::endl;
         return;
     }
-    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, nb_samples, 700);
+    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 7350, 4800);
     cairo_t *cr = cairo_create(surface);
 
     cairo_set_source_rgb (cr, 1,1,1);
